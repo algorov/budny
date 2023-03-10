@@ -5,7 +5,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 public class Account {
     protected Account() {
-        String driverPath = System.getProperty("user.dir") + "/src/main/driver/chromedriver";
+        String driverPath = System.getProperty("user.dir") + "/driver/chromedriver";
         System.setProperty("webdriver.chrome.driver", driverPath);
 
         ChromeOptions chromeOptions = new ChromeOptions();
