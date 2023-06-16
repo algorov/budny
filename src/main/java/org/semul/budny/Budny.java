@@ -1,7 +1,11 @@
 package org.semul.budny;
 
+
 public class Budny {
     public static void main(String[] args) {
-        Account account = new Account();
+        Manager manager = new Manager();
+
+        manager.addAccount(new Account("", ""));
+        manager.printAccounts();
     }
 }
