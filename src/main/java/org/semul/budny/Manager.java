@@ -6,7 +6,8 @@ import java.util.HashMap;
 public class Manager {
     private HashMap<String, Account> accounts = null;
 
-    Manager() {
+
+    public Manager() {
         accounts = new HashMap<>();
     }
 

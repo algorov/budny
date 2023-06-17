@@ -5,7 +5,14 @@ public class Budny {
     public static void main(String[] args) {
         Manager manager = new Manager();
 
-        manager.addAccount(new Account("", ""));
+        manager.addAccount(enableNewAccount("AHsgdajsd", " asdasdasd"));
         manager.printAccounts();
+    }
+
+    public static Account enableNewAccount(String username, String password) {
+        Account account = new Account(username, password);
+        account.start();
+
+        return account;
     }
 }
