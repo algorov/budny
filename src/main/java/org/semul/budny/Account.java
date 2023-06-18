@@ -51,6 +51,10 @@ public class Account extends Thread {
         return processingFlag;
     }
 
+    public void toggleProcessingFlag() {
+        this.processingFlag = !this.processingFlag;
+    }
+
     public boolean getSignInStatus() {
         return signInStatus;
     }

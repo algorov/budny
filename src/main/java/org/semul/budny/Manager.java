@@ -9,8 +9,7 @@ public class Manager {
         accounts = new HashMap<>();
     }
 
-    // TODO: wrap in decorator.
-    public void addAccount(Account account) {
+    private void synchronization(Account account) {
         while (!account.getProcessingFlag()) {
             try {
                 Thread.sleep(1000);
@@ -18,6 +17,12 @@ public class Manager {
                 throw new RuntimeException(e);
             }
         }
+
+        account.toggleProcessingFlag();
+    }
+
+    public void addAccount(Account account) {
+        synchronization(account);
 
         if (account.getSignInStatus()) {
             accounts.put(account.getUsername(), account);
