@@ -1,5 +1,7 @@
 package org.semul.budny;
 
+import org.semul.budny.helper.Session;
+
 public class Account extends Thread {
     private final String USERNAME;
     private final String PASSWORD;

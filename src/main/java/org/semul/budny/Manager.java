@@ -3,7 +3,7 @@ package org.semul.budny;
 import java.util.HashMap;
 
 public class Manager {
-    private HashMap<String, Account> accounts = null;
+    private HashMap<String, Account> accounts;
 
     public Manager() {
         accounts = new HashMap<>();

@@ -1,4 +1,4 @@
-package org.semul.budny;
+package org.semul.budny.helper;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -9,9 +9,9 @@ import org.semul.budny.captcha.CaptchaSolution;
 import org.semul.budny.heroeswm.HeroesWMStructure;
 
 public class Action {
-    private ChromeDriver driver;
+    private final ChromeDriver driver;
 
-    public Action(ChromeDriver driver) {
+    Action(ChromeDriver driver) {
         this.driver = driver;
     }
 

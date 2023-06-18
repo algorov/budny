@@ -1,4 +1,4 @@
-package org.semul.budny;
+package org.semul.budny.helper;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -12,7 +12,7 @@ public class Session {
     private ChromeDriver driver;
     private Action exec;
 
-    Session(String username, String password) {
+    public Session(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -56,11 +56,15 @@ public class Session {
         exec = null;
     }
 
-    public boolean sessionState() {
-        driver.navigate().refresh();
+    private boolean sessionState() {
+        if (driver != null) {
+            driver.navigate().refresh();
 
-        return !((HeroesWMStructure.URL).equals(driver.getCurrentUrl()) ||
-                (HeroesWMStructure.URL + HeroesWMStructure.LOGIN_PATH).equals(driver.getCurrentUrl()));
+            return !((HeroesWMStructure.URL).equals(driver.getCurrentUrl()) ||
+                    (HeroesWMStructure.URL + HeroesWMStructure.LOGIN_PATH).equals(driver.getCurrentUrl()));
+        }
+
+        return false;
     }
 
     private ChromeDriver initDriver() {
