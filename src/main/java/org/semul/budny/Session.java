@@ -12,31 +12,56 @@ public class Session {
     private ChromeDriver driver;
     private Action exec;
 
-
     Session(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
     // Connect to account.
-    public void startSession() {
+    public boolean startSession() {
         this.driver = initDriver();
         this.exec = new Action(driver);
         exec.signIn(this.username, this.password);
+
+        // Check for a connection to the account.
+        if (!sessionState()) {
+            String captchaUrl = exec.getCaptchaUrl();
+
+            if (captchaUrl != null) {
+                exec.signIn(username, password, captchaUrl);
+
+                if (!sessionState()) {
+                    System.out.println("Invalid data or incorrectly solved captcha!");
+                    interruptSession();
+
+                    return false;
+                }
+            } else {
+                System.out.println("Invalid data!");
+                interruptSession();
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void interruptSession() {
-        driver.close();
-        driver = null;
+        if (driver != null) {
+            driver.close();
+            driver = null;
+        }
+
         exec = null;
     }
 
-    // Account connection check.
-//    public boolean sessionState() {
-////        driver.navigate().refresh();
-////
-//        return !(HeroesWMStructure.URL).equals(driver.getCurrentUrl());
-//    }
+    public boolean sessionState() {
+        driver.navigate().refresh();
+
+        return !((HeroesWMStructure.URL).equals(driver.getCurrentUrl()) ||
+                (HeroesWMStructure.URL + HeroesWMStructure.LOGIN_PATH).equals(driver.getCurrentUrl()));
+    }
 
     private ChromeDriver initDriver() {
         String driverPath = System.getProperty("user.dir") + "/driver/chromedriver";

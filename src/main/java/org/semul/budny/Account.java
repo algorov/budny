@@ -1,11 +1,11 @@
 package org.semul.budny;
 
-
-public class Account extends Thread{
+public class Account extends Thread {
     private final String USERNAME;
     private final String PASSWORD;
-
     private Session session = null;
+    private boolean processingFlag = false;
+    private boolean signInStatus;
 
     // Command queue.
 
@@ -20,7 +20,15 @@ public class Account extends Thread{
         System.out.println("Account {" + this.USERNAME + "} will start working soon.");
 
         this.session = new Session(this.USERNAME, this.PASSWORD);
-        this.session.startSession();
+        if (this.session.startSession()) {
+            this.signInStatus = true;
+            System.out.println("Successful login!");
+        } else {
+            this.signInStatus = false;
+            System.out.println("Failed to login!");
+        }
+
+        processingFlag = true;
 
         try {
             Thread.sleep(2000);
@@ -37,5 +45,13 @@ public class Account extends Thread{
 
     public String getPassword() {
         return PASSWORD;
+    }
+
+    public boolean getProcessingFlag() {
+        return processingFlag;
+    }
+
+    public boolean getSignInStatus() {
+        return signInStatus;
     }
 }
