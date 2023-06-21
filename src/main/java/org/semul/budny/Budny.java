@@ -4,11 +4,11 @@ public class Budny {
     public static void main(String[] args) {
         Manager manager = new Manager();
 
-        manager.addAccount(enableNewAccount("", ""));
+        manager.addAccount(addAccount("", ""));
         manager.printAccounts();
     }
 
-    public static Account enableNewAccount(String username, String password) {
+    public static Account addAccount(String username, String password) {
         Account account = new Account(username, password);
         account.start();
 

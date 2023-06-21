@@ -6,27 +6,27 @@ public class Manager {
     private HashMap<String, Account> accounts;
 
     public Manager() {
-        accounts = new HashMap<>();
-    }
-
-    private void synchronization(Account account) {
-        while (!account.getProcessingFlag()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        account.toggleProcessingFlag();
+        this.accounts = new HashMap<>();
     }
 
     public void addAccount(Account account) {
         synchronization(account);
 
-        if (account.getSignInStatus()) {
+        if (account.getStatus()) {
             accounts.put(account.getUsername(), account);
         }
+    }
+
+    private void synchronization(Account account) {
+        while (!account.getСompletionStatus()) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        account.setCompletionStatus(false);
     }
 
     public void printAccounts() {
@@ -37,3 +37,4 @@ public class Manager {
 
     // Planning.
 }
+
