@@ -12,14 +12,14 @@ public class Manager {
     }
 
     public Account createAccount(String username, String password) {
-        Account account = new Account(username, password, taskQueue);
+        Account account = new Account(username, password);
         account.start();
 
         return account;
     }
 
     public void enableAccount(Account account) {
-        account.launch();
+        account.addTask(Account.Intention.LAUNCH);
         synchronization(account);
 
         if (account.getStatus()) {
@@ -28,16 +28,19 @@ public class Manager {
         } else {
             System.out.println("~ The account has not been added!");
         }
+
+        System.out.println(this);
     }
 
     public void disableAccount(Account account) {
-        account.disable();
+        account.addTask(Account.Intention.DISABLE);
         System.out.println(accounts.remove(account));
         System.out.println("~ {DELETE}\n" + account);
     }
 
     // *** Intents. ***
     public void getJob(Account account) {
+        account.addTask(Account.Intention.EMPLOY);
     }
 
     public void getInfo(Account account) {
@@ -66,7 +69,7 @@ public class Manager {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Account account : accounts) {
-            stringBuilder.append("~ ").append(account.getUsername()).append(": ").append(account.getPassword()).append(";");
+            stringBuilder.append(account.toString());
         }
 
         return stringBuilder.toString();

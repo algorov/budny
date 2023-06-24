@@ -1,6 +1,5 @@
 package org.semul.budny;
 
-import org.semul.budny.account.Account;
 import org.semul.budny.manager.Manager;
 
 public class Budny {
@@ -14,6 +13,8 @@ public class Budny {
         app.signIn(args[0], args[1]);
 
         System.out.println(app.manager);
+
+        app.manager.getJob(app.manager.getAccount(0));
 
         app.signOut(0);
     }
