@@ -1,4 +1,4 @@
-package org.semul.budny.helper;
+package org.semul.budny.connection;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -19,6 +19,48 @@ public class Session {
         this.exec = null;
     }
 
+    // Connect to account. If it fails, pushes for an exception.
+    public void start() throws StartSessionException {
+        if (this.driver == null) {
+            this.driver = initDriver();
+            this.exec = new Action(this.driver, this.username, this.password);
+        }
+
+        this.exec.signIn();
+
+        // Check for a connection to the account.
+        if (!status()) {
+            String captchaUrl = this.exec.getCaptchaUrl();
+
+            if (captchaUrl != null) {
+                this.exec.signIn(captchaUrl);
+
+                if (!status()) {
+                    throw new StartSessionException();
+                }
+            } else {
+                throw new StartSessionException();
+            }
+        }
+
+        System.out.println("~ {Successful login!}");
+    }
+
+    // Disconnecting account's connection.
+    public void interrupt() {
+        if (this.driver != null) {
+            this.driver.close();
+            this.driver = null;
+        }
+
+        this.exec = null;
+    }
+
+    // Reconnect to account. If it fails, pushes for an exception.
+    private void restore() throws StartSessionException {
+        start();
+    }
+
     private ChromeDriver initDriver() {
         String driverPath = System.getProperty("user.dir") + "/driver/chromedriver";
         System.setProperty("webdriver.chrome.driver", driverPath);
@@ -37,47 +79,6 @@ public class Session {
         driver.manage().timeouts().scriptTimeout(Duration.ofMillis(5000));
 
         return driver;
-    }
-
-    // Connect to account. Returns true on connection, false otherwise.
-    public void start() throws StartSessionException {
-        if (this.driver == null) {
-            this.driver = initDriver();
-            this.exec = new Action(driver);
-        }
-
-        this.exec.signIn(this.username, this.password);
-
-        // Check for a connection to the account.
-        if (!status()) {
-            String captchaUrl = this.exec.getCaptchaUrl();
-
-            if (captchaUrl != null) {
-                this.exec.signIn(username, password, captchaUrl);
-
-                if (!status()) {
-                    throw new StartSessionException();
-                }
-            } else {
-                throw new StartSessionException();
-            }
-        }
-
-        System.out.println("~ {Successful login!}");
-    }
-
-    private void restore() throws StartSessionException {
-        start();
-    }
-
-    // Disconnecting a account's connection.
-    public void interrupt() {
-        if (this.driver != null) {
-            this.driver.close();
-            this.driver = null;
-        }
-
-        this.exec = null;
     }
 
     // Account connection check.

@@ -1,4 +1,4 @@
-package org.semul.budny.helper;
+package org.semul.budny.connection;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -10,42 +10,45 @@ import org.semul.budny.heroeswm.HeroesWMStructure;
 
 public class Action {
     private final ChromeDriver driver;
+    private final String username;
+    private final String password;
 
-    Action(ChromeDriver driver) {
+    Action(ChromeDriver driver, String username, String password) {
         this.driver = driver;
+        this.username = username;
+        this.password = password;
     }
 
-    // Login.
-    public void signIn(String username, String password) {
+    public void signIn() {
         this.driver.get(HeroesWMStructure.URL);
 
         try {
             WebElement loginField = driver.findElement(new By.ByClassName("inp_login"));
             loginField.clear();
-            loginField.sendKeys(username);
+            loginField.sendKeys(this.username);
 
             WebElement passwordField = driver.findElement(new By.ByClassName("inp_pass"));
             passwordField.clear();
-            passwordField.sendKeys(password);
+            passwordField.sendKeys(this.password);
 
             WebElement authButton = driver.findElement(new By.ByClassName("entergame"));
             authButton.click();
         } catch (NoSuchElementException e) {}
     }
 
-    public void signIn(String username, String password, String captchaUrl) {
+    public void signIn(String captchaUrl) {
         try {
             WebElement loginField = driver.findElement(
                     new By.ByXPath("/html/body/center/table/tbody/tr/td/table/" +
                             "tbody/tr/td/form/table/tbody/tr[1]/td[2]/input"));
             loginField.clear();
-            loginField.sendKeys(username);
+            loginField.sendKeys(this.username);
 
             WebElement passwordField = driver.findElement(
                     new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/" +
                             "tr/td/form/table/tbody/tr[2]/td[2]/input"));
             passwordField.clear();
-            passwordField.sendKeys(password);
+            passwordField.sendKeys(this.password);
 
             String captchaPath = Captcha.save(captchaUrl);
             String code = CaptchaSolution.solution(captchaPath);

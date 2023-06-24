@@ -1,29 +1,31 @@
-package org.semul.budny;
+package org.semul.budny.account;
 
 import org.semul.budny.exception.StartSessionException;
-import org.semul.budny.helper.Session;
+import org.semul.budny.connection.Session;
 
 public class Account extends Thread {
     private final String username;
     private final String password;
     private boolean status;
-    private Session session;
     private volatile boolean completionStatus;
+    private Session session;
 
     // Command queue.
 
 
-    Account(String username, String password) {
+    public Account(String username, String password) {
         this.username = username;
         this.password = password;
-        this.status = false;
-        this.session = null;
+        this.status = true;
         this.completionStatus = false;
+        this.session = null;
     }
 
     @Override
     public void run() {
+        while (this.status) {
 
+        }
     }
 
     public void launch() {
@@ -31,7 +33,6 @@ public class Account extends Thread {
 
         try {
             this.session.start();
-            this.status = true;
         } catch (StartSessionException e) {
             System.out.println(e.getMessage());
             disable();
@@ -47,7 +48,6 @@ public class Account extends Thread {
         }
 
         this.status = false;
-        this.completionStatus = true;
     }
 
     public String getUsername() {
@@ -62,11 +62,17 @@ public class Account extends Thread {
         return this.status;
     }
 
-    public boolean getСompletionStatus() {
+    public boolean getCompletionStatus() {
         return this.completionStatus;
     }
 
-    public void setCompletionStatus(boolean value) {
-        this.completionStatus = value;
+    public void changeCompletionStatus() {
+        this.completionStatus = !this.completionStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "~ Account {\n▬ username: " + this.username + ";\n" + "▬ password: " + this.password + ";\n"
+                + "▬ status: " + this.status + ";}";
     }
 }

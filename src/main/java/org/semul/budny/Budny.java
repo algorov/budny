@@ -1,17 +1,28 @@
 package org.semul.budny;
 
-public class Budny {
-    public static void main(String[] args) {
-        Manager manager = new Manager();
+import org.semul.budny.account.Account;
+import org.semul.budny.manager.Manager;
 
-        manager.addAccount(addAccount("", ""));
-        manager.printAccounts();
+public class Budny {
+    private final Manager manager;
+
+    public Budny() {
+        this.manager = new Manager();
+    }
+    public static void main(String[] args) {
+        Budny app = new Budny();
+        app.signIn(args[0], args[1]);
+
+        System.out.println(app.manager);
+
+        app.signOut(0);
     }
 
-    public static Account addAccount(String username, String password) {
-        Account account = new Account(username, password);
-        account.start();
+    public void signIn(String username, String password) {
+        manager.enableAccount(manager.createAccount(username, password));
+    }
 
-        return account;
+    public void signOut(int accountId) {
+        this.manager.disableAccount(this.manager.getAccount(accountId));
     }
 }
