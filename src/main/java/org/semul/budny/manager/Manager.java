@@ -22,20 +22,14 @@ public class Manager {
         account.addTask(Account.Intention.LAUNCH);
         synchronization(account);
 
-        if (account.getStatus()) {
+        if (account.getStatus())
             accounts.add(account);
-            System.out.println("~ Account has been added!");
-        } else {
-            System.out.println("~ The account has not been added!");
-        }
-
-        System.out.println(this);
     }
 
     public void disableAccount(Account account) {
         account.addTask(Account.Intention.DISABLE);
-        System.out.println(accounts.remove(account));
-        System.out.println("~ {DELETE}\n" + account);
+        synchronization(account);
+        accounts.remove(account);
     }
 
     // *** Intents. ***
@@ -49,7 +43,6 @@ public class Manager {
     // Waiting for a response from another (account) thread about the completion of the process.
     private void synchronization(Account account) {
         while (!account.getCompletionStatus()) {
-            System.out.println("Wait...");
             try {
                 Thread.sleep(2333);
             } catch (InterruptedException e) {
@@ -66,7 +59,7 @@ public class Manager {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder("\n~~~ Manager ~~~\n");
 
         for (Account account : accounts) {
             stringBuilder.append(account.toString());

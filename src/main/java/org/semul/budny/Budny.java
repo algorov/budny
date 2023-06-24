@@ -8,6 +8,7 @@ public class Budny {
     public Budny() {
         this.manager = new Manager();
     }
+
     public static void main(String[] args) {
         Budny app = new Budny();
         app.signIn(args[0], args[1]);
@@ -15,7 +16,7 @@ public class Budny {
         System.out.println(app.manager);
 
         app.manager.getJob(app.manager.getAccount(0));
-
+        app.manager.getJob(app.manager.getAccount(0));
         app.signOut(0);
     }
 

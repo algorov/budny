@@ -29,13 +29,13 @@ public class Session {
         this.exec.signIn();
 
         // Check for a connection to the account.
-        if (!status()) {
+        if (status()) {
             String captchaUrl = this.exec.getCaptchaUrl();
 
             if (captchaUrl != null) {
                 this.exec.signIn(captchaUrl);
 
-                if (!status()) {
+                if (status()) {
                     throw new StartSessionException();
                 }
             } else {
@@ -84,8 +84,8 @@ public class Session {
     // Account connection check.
     private boolean status() {
         if (this.exec != null)
-            return this.exec.checkConnection();
+            return !this.exec.checkConnection();
 
-        return false;
+        return true;
     }
 }

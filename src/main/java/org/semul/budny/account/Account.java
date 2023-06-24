@@ -12,9 +12,11 @@ public class Account extends Thread {
     private boolean status;
     private volatile boolean completionStatus;
     private Session session;
-
     private final Queue taskQueue;
 
+    public enum Intention {
+        LAUNCH, DISABLE, EMPLOY
+    }
 
     public Account(String username, String password) {
         this.username = username;
@@ -25,10 +27,6 @@ public class Account extends Thread {
         this.session = null;
     }
 
-    public enum Intention {
-        LAUNCH, DISABLE, EMPLOY
-    }
-
     public void addTask(Intention intention) {
         this.taskQueue.add(intention);
     }
@@ -36,12 +34,10 @@ public class Account extends Thread {
     @Override
     public void run() {
         while (this.status) {
-            System.out.println("Ждем-с...");
-
             if (this.taskQueue.size() > 0) {
-                Intention intent = (Intention) this.taskQueue.poll();
+                Intention intention = (Intention) this.taskQueue.poll();
 
-                switch (intent) {
+                switch (intention) {
                     case LAUNCH:
                         launch();
                         break;
@@ -52,6 +48,12 @@ public class Account extends Thread {
                         employ();
                         break;
                 }
+            }
+
+            try {
+                sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -77,6 +79,7 @@ public class Account extends Thread {
         }
 
         this.status = false;
+        this.completionStatus = true;
     }
 
     private void employ() {
@@ -105,7 +108,7 @@ public class Account extends Thread {
 
     @Override
     public String toString() {
-        return "~ Account {\n▬ username: " + this.username + ";\n" + "▬ password: " + this.password + ";\n"
-                + "▬ status: " + this.status + ";}";
+        return "\n● Account:\n▬▬ username: " + this.username + ";\n" + "▬▬ password: " + this.password + ";\n"
+                + "▬▬ status: " + (this.status ? "launched" : "stopped") + ";\n";
     }
 }
