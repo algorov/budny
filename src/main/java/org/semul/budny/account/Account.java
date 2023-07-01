@@ -13,7 +13,7 @@ public class Account extends Thread {
     private boolean status;
     private volatile boolean completionStatus;
     private Session session;
-    private final Queue taskQueue;
+    private final Queue<Intention> taskQueue;
 
     public enum Intention {
         LAUNCH, DISABLE, EMPLOY
@@ -36,23 +36,15 @@ public class Account extends Thread {
     public void run() {
         while (this.status) {
             if (this.taskQueue.size() > 0) {
-                Intention intention = (Intention) this.taskQueue.poll();
-
-                switch (intention) {
-                    case LAUNCH:
-                        launch();
-                        break;
-                    case DISABLE:
-                        disable();
-                        break;
-                    case EMPLOY:
-                        employ();
-                        break;
+                switch (this.taskQueue.poll()) {
+                    case LAUNCH -> launch();
+                    case DISABLE -> disable();
+                    case EMPLOY -> employ();
                 }
             }
 
             try {
-                sleep(2000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
