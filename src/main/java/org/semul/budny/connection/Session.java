@@ -3,6 +3,7 @@ package org.semul.budny.connection;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.semul.budny.action.Action;
+import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
 
 import java.time.Duration;
@@ -37,14 +38,14 @@ public class Session {
                 this.exec.signIn(captchaUrl);
 
                 if (status()) {
-                    throw new StartSessionException();
+                    throw new StartSessionException(">>> [Error] - Not valid data or captcha!");
                 }
             } else {
-                throw new StartSessionException();
+                throw new StartSessionException(">>> [Error] - Not valid data!");
             }
         }
 
-        System.out.println("~ {Successful login!}");
+        System.out.println(">>> [INFO] Successful authorization!");
     }
 
     // Disconnecting account's connection.
@@ -90,7 +91,7 @@ public class Session {
         return true;
     }
 
-    public void employ() {
+    public void employ() throws FailEmployException{
         this.exec.employ();
     }
 }

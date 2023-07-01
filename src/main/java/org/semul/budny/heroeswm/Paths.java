@@ -14,24 +14,24 @@ public class Paths {
 
     /* *** Login page *** */
     // Paths for web elements (ByClassName).
-    public static final String LOGIN_FIELD_PATH = "inp_login";
-    public static final String PASSWORD_FIELD_PATH = "inp_pass";
-    public static final String AUTH_BTN_PATH = "entergame";
+    public static final String L_EFP01_LOGIN = "inp_login";
+    public static final String L_EFP01_PASSWORD = "inp_pass";
+    public static final String L_BTNP01_AUTH = "entergame";
 
     // Paths for web elements (ByXPath) in case of incorrect data entry or if captcha detection is needed.
-    public static final String LOGIN_FIELD_PATH_2 = "/html/body/center/table/tbody/tr/td/table/" +
+    public static final String L_EFP02_LOGIN = "/html/body/center/table/tbody/tr/td/table/" +
             "tbody/tr/td/form/table/tbody/tr[1]/td[2]/input";
-    public static final String PASSWORD_FIELD_PATH_2 = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+    public static final String L_EFP02_PASSWORD = "/html/body/center/table/tbody/tr/td/table/tbody/" +
             "tr/td/form/table/tbody/tr[2]/td[2]/input";
-    public static final String CAPTCHA_FIELD_PATH = "/html/body/center/table/tbody/tr/td/table/tbody/tr/td/" +
+    public static final String L_FP01_CAPTCHA = "/html/body/center/table/tbody/tr/td/table/tbody/tr/td/" +
             "form/table/tbody/tr[4]/td/table/tbody/tr/td[1]/img";
-    public static final String CAPTCHA_ENTER_FIELD_PATH = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+    public static final String L_EFP01_CAPTCHA = "/html/body/center/table/tbody/tr/td/table/tbody/" +
             "tr/td/form/table/tbody/tr[4]/td/table/tbody/tr/td[2]/input";
-    public static final String AUTH_BTN_PATH_2 = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+    public static final String L_BTNP02_AUTH = "/html/body/center/table/tbody/tr/td/table/tbody/" +
             "tr/td/form/table/tbody/tr[5]/td/input[1]";
 
 
-    /* *** Map *** */
+    /* *** Map page *** */
     public static final Map<String, String> MAP_SECTOR = Map.ofEntries(
             entry("Ungovernable Steppe", "cx=48&cy=48"),
             entry("Eagle Nest", "cx=49&cy=48"),
@@ -61,6 +61,16 @@ public class Paths {
             entry("Kingdom Castle", "cx=52&cy=54")
     );
 
+    // Paths for web elements (ByXPath).
+    public static final String M_FP01_LABEL = "//*[@id=\"set_mobile_max_width\"]/div[1]/b";
+
+
+    /* *** Object-info page *** */
+    // Paths for web elements (ByXPath).
+    public static final String OI_FP01_CAPTCHA = "//*[@id=\"getjob_form\"]/img[1]";
+    public static final String OI_EFP01_CAPTCHA = "//*[@id=\"code\"]";
+    public static final String OI_BTNP01_EMPLOY = "//*[@id=\"wbtn\"]";
+
     public enum WorkType {
         MINING("sh"),
         PROCESSING("fc"),
@@ -68,12 +78,12 @@ public class Paths {
 
         private final String value;
 
-        public String getValue() {
-            return this.value;
-        }
-
         WorkType(String value) {
             this.value = value;
+        }
+
+        public String getValue() {
+            return this.value;
         }
     }
 }

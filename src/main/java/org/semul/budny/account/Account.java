@@ -1,7 +1,8 @@
 package org.semul.budny.account;
 
-import org.semul.budny.exception.StartSessionException;
 import org.semul.budny.connection.Session;
+import org.semul.budny.exception.FailEmployException;
+import org.semul.budny.exception.StartSessionException;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -83,7 +84,10 @@ public class Account extends Thread {
     }
 
     private void employ() {
-        this.session.employ();
+        try {
+            this.session.employ();
+        } catch (FailEmployException e) {
+        }
     }
 
     public String getUsername() {

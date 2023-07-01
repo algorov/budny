@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.semul.budny.captcha.Captcha;
 import org.semul.budny.captcha.CaptchaSolution;
+import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.heroeswm.Paths;
 
 public class Action {
@@ -21,28 +22,28 @@ public class Action {
 
     public void signIn() {
         this.driver.get(Paths.URL);
-
         try {
-            WebElement loginField = driver.findElement(new By.ByClassName(Paths.LOGIN_FIELD_PATH));
+            WebElement loginField = driver.findElement(new By.ByClassName(Paths.L_EFP01_LOGIN));
             loginField.clear();
             loginField.sendKeys(this.username);
 
-            WebElement passwordField = driver.findElement(new By.ByClassName(Paths.PASSWORD_FIELD_PATH));
+            WebElement passwordField = driver.findElement(new By.ByClassName(Paths.L_EFP01_PASSWORD));
             passwordField.clear();
             passwordField.sendKeys(this.password);
 
-            WebElement authButton = driver.findElement(new By.ByClassName(Paths.AUTH_BTN_PATH));
+            WebElement authButton = driver.findElement(new By.ByClassName(Paths.L_BTNP01_AUTH));
             authButton.click();
-        } catch (NoSuchElementException e) {}
+        } catch (NoSuchElementException e) {
+        }
     }
 
     public void signIn(String captchaUrl) {
         try {
-            WebElement loginField = driver.findElement(new By.ByXPath(Paths.LOGIN_FIELD_PATH_2));
+            WebElement loginField = driver.findElement(new By.ByXPath(Paths.L_EFP02_LOGIN));
             loginField.clear();
             loginField.sendKeys(this.username);
 
-            WebElement passwordField = driver.findElement(new By.ByXPath(Paths.PASSWORD_FIELD_PATH_2));
+            WebElement passwordField = driver.findElement(new By.ByXPath(Paths.L_EFP02_PASSWORD));
             passwordField.clear();
             passwordField.sendKeys(this.password);
 
@@ -51,34 +52,29 @@ public class Action {
             Captcha.delete(captchaPath);
 
             if (code != null) {
-                WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.CAPTCHA_ENTER_FIELD_PATH));
+                WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.L_EFP01_CAPTCHA));
                 captchaCodeField.clear();
                 captchaCodeField.sendKeys(code);
             }
 
-            WebElement authButton = driver.findElement(new By.ByXPath(Paths.AUTH_BTN_PATH_2));
+            WebElement authButton = driver.findElement(new By.ByXPath(Paths.L_BTNP02_AUTH));
             authButton.click();
-        } catch (NoSuchElementException e) {}
+        } catch (NoSuchElementException e) {
+        }
     }
 
     public String getCaptchaUrl() {
-        System.out.print(">>> Get captcha URL -> ");
-
         WebElement captchaField = null;
-
         try {
-            captchaField = driver.findElement(new By.ByXPath("//*[@id=\"getjob_form\"]/img[1]"));
+            captchaField = driver.findElement(new By.ByXPath(Paths.OI_FP01_CAPTCHA));
         } catch (NoSuchElementException e) {
             try {
-                captchaField = driver.findElement(new By.ByXPath(Paths.CAPTCHA_FIELD_PATH));
+                captchaField = driver.findElement(new By.ByXPath(Paths.L_FP01_CAPTCHA));
             } catch (NoSuchElementException q) {
             }
         }
 
-        String captchaUrl = captchaField != null ? captchaField.getAttribute("src") : null;
-        System.out.println(captchaUrl);
-
-        return captchaUrl;
+        return captchaField != null ? captchaField.getAttribute("src") : null;
     }
 
     public boolean checkConnection() {
@@ -93,73 +89,62 @@ public class Action {
     }
 
     // Apparatus employed.
-    public void employ() {
+    public void employ() throws FailEmployException{
         this.driver.get(Paths.URL + Paths.MAP_PATH);
 
-        String sectorPath = defSector();
         String vacancyUrl = null;
-
+        String sectorPath = defSector();
         if (sectorPath != null) {
             vacancyUrl = defJobPath(sectorPath);
         } else {
-            System.out.println("Бабубэ0");
+            throw new FailEmployException(">>> [Error] - Sector not defined!");
         }
 
         if (vacancyUrl != null) {
             driver.get(vacancyUrl);
 
             String quessCaptchaUrl = getCaptchaUrl();
-
             if (quessCaptchaUrl != null) {
                 String localPath = Captcha.save(quessCaptchaUrl);
                 String solution = CaptchaSolution.solution(localPath);
                 Captcha.delete(localPath);
 
                 if (solution != null) {
-                    WebElement captchaEnterField = driver.findElement(new By.ByXPath("//*[@id=\"code\"]"));
+                    WebElement captchaEnterField = driver.findElement(new By.ByXPath(Paths.OI_EFP01_CAPTCHA));
                     captchaEnterField.click();
                     captchaEnterField.sendKeys(solution);
                 } else {
-                    System.out.println("Бабубэ");
+                    throw new FailEmployException(">>> [Error] - No solving captcha!");
                 }
             }
 
             try {
-                WebElement employButton = driver.findElement(new By.ByXPath("//*[@id=\"wbtn\"]"));
+                WebElement employButton = driver.findElement(new By.ByXPath(Paths.OI_BTNP01_EMPLOY));
                 employButton.click();
             } catch (NoSuchElementException e) {
-                System.out.println("Бабубэ2");
+                throw new FailEmployException(">>> [Error] - NoSuchElementException!");
             }
         } else {
-            System.out.println("Бабубэ3");
+            throw new FailEmployException(">>> [Error] - No vacancies!");
         }
     }
 
     private String defSector() {
-        System.out.print(">>> Area definition -> ");
-
         WebElement labelField = null;
-
         try {
-            labelField = driver.findElement(new By.ByXPath("//*[@id=\"set_mobile_max_width\"]/div[1]/b"));
+            labelField = driver.findElement(new By.ByXPath(Paths.M_FP01_LABEL));
         } catch (NoSuchElementException e) {
         }
 
-        String label = labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
-        System.out.println(label);
-
-        return label;
+        return labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
     }
 
-    public String defJobPath(String sectorPath) {
-        System.out.print(">>> Get job -> ");
-
+    private String defJobPath(String sectorPath) {
         for (Paths.WorkType item : Paths.WorkType.values()) {
-            WebElement vacancyField = null;
-
             String url = Paths.URL + Paths.MAP_PATH + "?" + sectorPath + "&st=" + item.getValue();
             this.driver.get(url);
 
+            WebElement vacancyField = null;
             try {
                 vacancyField = this.driver.findElement(new By.ByLinkText("»»»"));
             } catch (NoSuchElementException e) {
@@ -169,8 +154,6 @@ public class Action {
                 return vacancyField.getAttribute("href");
             }
         }
-
-        System.out.println("empty.");
 
         return null;
     }
