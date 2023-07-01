@@ -2,6 +2,7 @@ package org.semul.budny.connection;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.semul.budny.action.Action;
 import org.semul.budny.exception.StartSessionException;
 
 import java.time.Duration;

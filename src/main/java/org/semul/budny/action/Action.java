@@ -1,4 +1,4 @@
-package org.semul.budny.connection;
+package org.semul.budny.action;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -6,47 +6,43 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.semul.budny.captcha.Captcha;
 import org.semul.budny.captcha.CaptchaSolution;
-import org.semul.budny.heroeswm.HeroesWMStructure;
+import org.semul.budny.heroeswm.Paths;
 
 public class Action {
     private final ChromeDriver driver;
     private final String username;
     private final String password;
 
-    Action(ChromeDriver driver, String username, String password) {
+    public Action(ChromeDriver driver, String username, String password) {
         this.driver = driver;
         this.username = username;
         this.password = password;
     }
 
     public void signIn() {
-        this.driver.get(HeroesWMStructure.URL);
+        this.driver.get(Paths.URL);
 
         try {
-            WebElement loginField = driver.findElement(new By.ByClassName("inp_login"));
+            WebElement loginField = driver.findElement(new By.ByClassName(Paths.LOGIN_FIELD_PATH));
             loginField.clear();
             loginField.sendKeys(this.username);
 
-            WebElement passwordField = driver.findElement(new By.ByClassName("inp_pass"));
+            WebElement passwordField = driver.findElement(new By.ByClassName(Paths.PASSWORD_FIELD_PATH));
             passwordField.clear();
             passwordField.sendKeys(this.password);
 
-            WebElement authButton = driver.findElement(new By.ByClassName("entergame"));
+            WebElement authButton = driver.findElement(new By.ByClassName(Paths.AUTH_BTN_PATH));
             authButton.click();
         } catch (NoSuchElementException e) {}
     }
 
     public void signIn(String captchaUrl) {
         try {
-            WebElement loginField = driver.findElement(
-                    new By.ByXPath("/html/body/center/table/tbody/tr/td/table/" +
-                            "tbody/tr/td/form/table/tbody/tr[1]/td[2]/input"));
+            WebElement loginField = driver.findElement(new By.ByXPath(Paths.LOGIN_FIELD_PATH_2));
             loginField.clear();
             loginField.sendKeys(this.username);
 
-            WebElement passwordField = driver.findElement(
-                    new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/" +
-                            "tr/td/form/table/tbody/tr[2]/td[2]/input"));
+            WebElement passwordField = driver.findElement(new By.ByXPath(Paths.PASSWORD_FIELD_PATH_2));
             passwordField.clear();
             passwordField.sendKeys(this.password);
 
@@ -55,16 +51,12 @@ public class Action {
             Captcha.delete(captchaPath);
 
             if (code != null) {
-                WebElement captchaCodeField = driver.findElement(
-                        new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/" +
-                                "tr/td/form/table/tbody/tr[4]/td/table/tbody/tr/td[2]/input"));
+                WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.CAPTCHA_ENTER_FIELD_PATH));
                 captchaCodeField.clear();
                 captchaCodeField.sendKeys(code);
             }
 
-            WebElement authButton = driver.findElement(
-                    new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/" +
-                            "tr/td/form/table/tbody/tr[5]/td/input[1]"));
+            WebElement authButton = driver.findElement(new By.ByXPath(Paths.AUTH_BTN_PATH_2));
             authButton.click();
         } catch (NoSuchElementException e) {}
     }
@@ -78,9 +70,7 @@ public class Action {
             captchaField = driver.findElement(new By.ByXPath("//*[@id=\"getjob_form\"]/img[1]"));
         } catch (NoSuchElementException e) {
             try {
-                captchaField = driver.findElement(
-                        new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/tr/td/"
-                                + "form/table/tbody/tr[4]/td/table/tbody/tr/td[1]/img"));
+                captchaField = driver.findElement(new By.ByXPath(Paths.CAPTCHA_FIELD_PATH));
             } catch (NoSuchElementException q) {
             }
         }
@@ -95,8 +85,8 @@ public class Action {
         if (this.driver != null) {
             this.driver.navigate().refresh();
 
-            return !((HeroesWMStructure.URL).equals(this.driver.getCurrentUrl()) ||
-                    (HeroesWMStructure.URL + HeroesWMStructure.LOGIN_PATH).equals(this.driver.getCurrentUrl()));
+            return !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
+                    (Paths.URL + Paths.LOGIN_PATH).equals(this.driver.getCurrentUrl()));
         }
 
         return false;

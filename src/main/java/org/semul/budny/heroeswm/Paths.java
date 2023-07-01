@@ -11,6 +11,26 @@ public class Paths {
     public static final String HOME_PATH = "home.php";
     public static final String MAP_PATH = "map.php";
 
+
+    /* *** Login page *** */
+    // Paths for web elements (ByClassName).
+    public static final String LOGIN_FIELD_PATH = "inp_login";
+    public static final String PASSWORD_FIELD_PATH = "inp_pass";
+    public static final String AUTH_BTN_PATH = "entergame";
+
+    // Paths for web elements (ByXPath) in case of incorrect data entry or if captcha detection is needed.
+    public static final String LOGIN_FIELD_PATH_2 = "/html/body/center/table/tbody/tr/td/table/" +
+            "tbody/tr/td/form/table/tbody/tr[1]/td[2]/input";
+    public static final String PASSWORD_FIELD_PATH_2 = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+            "tr/td/form/table/tbody/tr[2]/td[2]/input";
+    public static final String CAPTCHA_FIELD_PATH = "/html/body/center/table/tbody/tr/td/table/tbody/tr/td/" +
+            "form/table/tbody/tr[4]/td/table/tbody/tr/td[1]/img";
+    public static final String CAPTCHA_ENTER_FIELD_PATH = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+            "tr/td/form/table/tbody/tr[4]/td/table/tbody/tr/td[2]/input";
+    public static final String AUTH_BTN_PATH_2 = "/html/body/center/table/tbody/tr/td/table/tbody/" +
+            "tr/td/form/table/tbody/tr[5]/td/input[1]";
+
+
     /* *** Map *** */
     public static final Map<String, String> MAP_SECTOR = Map.ofEntries(
             entry("Ungovernable Steppe", "cx=48&cy=48"),
