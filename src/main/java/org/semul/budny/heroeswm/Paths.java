@@ -4,15 +4,15 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class HeroesWMStructure {
-    // Paths.
+public class Paths {
+    /* *** Page paths *** */
     public static final String URL = "https://www.heroeswm.ru/";
     public static final String LOGIN_PATH = "login.php";
     public static final String HOME_PATH = "home.php";
     public static final String MAP_PATH = "map.php";
 
-    // Districts map.
-    public static final Map<String, String> DISTRICTS = Map.ofEntries(
+    /* *** Map *** */
+    public static final Map<String, String> MAP_SECTOR = Map.ofEntries(
             entry("Ungovernable Steppe", "cx=48&cy=48"),
             entry("Eagle Nest", "cx=49&cy=48"),
             entry("Peaceful Camp", "cx=50&cy=48"),
@@ -41,10 +41,19 @@ public class HeroesWMStructure {
             entry("Kingdom Castle", "cx=52&cy=54")
     );
 
-    // Vacancies.
-    public static final String[] STRUCTURES = new String[]{"sh", "fc", "mn"};
+    enum WorkType {
+        MINING("sh"),
+        PROCESSING("fc"),
+        PRODUCTION("mn");
 
-    // Employment Status.
-    public static final String free = "Вы нигде не работаете.";
-    public static final String freeSoon = "Последнее место работы:";
+        private final String value;
+
+        public String getValue() {
+            return this.value;
+        }
+
+        WorkType(String value) {
+            this.value = value;
+        }
+    }
 }
