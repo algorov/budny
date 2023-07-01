@@ -61,7 +61,7 @@ public class Paths {
             entry("Kingdom Castle", "cx=52&cy=54")
     );
 
-    enum WorkType {
+    public enum WorkType {
         MINING("sh"),
         PROCESSING("fc"),
         PRODUCTION("mn");

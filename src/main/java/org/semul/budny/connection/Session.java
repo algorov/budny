@@ -89,4 +89,8 @@ public class Session {
 
         return true;
     }
+
+    public void employ() {
+        this.exec.employ();
+    }
 }

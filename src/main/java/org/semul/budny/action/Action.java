@@ -94,5 +94,84 @@ public class Action {
 
     // Apparatus employed.
     public void employ() {
+        this.driver.get(Paths.URL + Paths.MAP_PATH);
+
+        String sectorPath = defSector();
+        String vacancyUrl = null;
+
+        if (sectorPath != null) {
+            vacancyUrl = defJobPath(sectorPath);
+        } else {
+            System.out.println("Бабубэ0");
+        }
+
+        if (vacancyUrl != null) {
+            driver.get(vacancyUrl);
+
+            String quessCaptchaUrl = getCaptchaUrl();
+
+            if (quessCaptchaUrl != null) {
+                String localPath = Captcha.save(quessCaptchaUrl);
+                String solution = CaptchaSolution.solution(localPath);
+                Captcha.delete(localPath);
+
+                if (solution != null) {
+                    WebElement captchaEnterField = driver.findElement(new By.ByXPath("//*[@id=\"code\"]"));
+                    captchaEnterField.click();
+                    captchaEnterField.sendKeys(solution);
+                } else {
+                    System.out.println("Бабубэ");
+                }
+            }
+
+            try {
+                WebElement employButton = driver.findElement(new By.ByXPath("//*[@id=\"wbtn\"]"));
+                employButton.click();
+            } catch (NoSuchElementException e) {
+                System.out.println("Бабубэ2");
+            }
+        } else {
+            System.out.println("Бабубэ3");
+        }
+    }
+
+    private String defSector() {
+        System.out.print(">>> Area definition -> ");
+
+        WebElement labelField = null;
+
+        try {
+            labelField = driver.findElement(new By.ByXPath("//*[@id=\"set_mobile_max_width\"]/div[1]/b"));
+        } catch (NoSuchElementException e) {
+        }
+
+        String label = labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
+        System.out.println(label);
+
+        return label;
+    }
+
+    public String defJobPath(String sectorPath) {
+        System.out.print(">>> Get job -> ");
+
+        for (Paths.WorkType item : Paths.WorkType.values()) {
+            WebElement vacancyField = null;
+
+            String url = Paths.URL + Paths.MAP_PATH + "?" + sectorPath + "&st=" + item.getValue();
+            this.driver.get(url);
+
+            try {
+                vacancyField = this.driver.findElement(new By.ByLinkText("»»»"));
+            } catch (NoSuchElementException e) {
+            }
+
+            if (vacancyField != null) {
+                return vacancyField.getAttribute("href");
+            }
+        }
+
+        System.out.println("empty.");
+
+        return null;
     }
 }

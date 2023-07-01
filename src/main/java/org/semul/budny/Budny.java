@@ -16,7 +16,6 @@ public class Budny {
         System.out.println(app.manager);
 
         app.manager.getJob(app.manager.getAccount(0));
-        app.manager.getJob(app.manager.getAccount(0));
         app.signOut(0);
     }
 

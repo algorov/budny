@@ -83,7 +83,7 @@ public class Account extends Thread {
     }
 
     private void employ() {
-        System.out.println("~ It's work!");
+        this.session.employ();
     }
 
     public String getUsername() {
