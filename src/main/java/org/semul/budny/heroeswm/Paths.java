@@ -10,6 +10,7 @@ public class Paths {
     public static final String LOGIN_PATH = "login.php";
     public static final String HOME_PATH = "home.php";
     public static final String MAP_PATH = "map.php";
+    public static final String OI_PATH = "object-info.php";
 
 
     /* *** Login page *** */
