@@ -10,7 +10,7 @@ import java.util.Queue;
 public class Account extends Thread {
     private final String username;
     private final String password;
-    private boolean status;
+    private volatile boolean status;
     private volatile boolean completionStatus;
     private Session session;
     private final Queue<Intention> taskQueue;
@@ -58,11 +58,11 @@ public class Account extends Thread {
 
         try {
             this.session.start();
+            this.status = true;
         } catch (StartSessionException e) {
             System.out.println(e.getMessage());
             disable();
         } finally {
-            this.status = true;
             this.completionStatus = true;
         }
     }

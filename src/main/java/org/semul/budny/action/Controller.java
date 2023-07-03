@@ -4,13 +4,11 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.exception.FailEmployException;
 
-public class IntentController {
-    private final ChromeDriver driver;
+public class Controller {
     private Connection connect;
     private Employ employ;
 
-    public IntentController(ChromeDriver driver, String username, String password) {
-        this.driver = driver;
+    public Controller(ChromeDriver driver, String username, String password) {
         this.connect = new Connection(driver, username, password);
         this.employ = new Employ(driver, username, password);
     }
@@ -28,11 +26,7 @@ public class IntentController {
     }
 
     public boolean checkConnection() {
-        if (this.driver != null) {
-            return connect.status();
-        }
-
-        return false;
+        return connect.status();
     }
 
     public void employ() throws FailEmployException {

@@ -2,7 +2,7 @@ package org.semul.budny.connection;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.semul.budny.action.IntentController;
+import org.semul.budny.action.Controller;
 import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
@@ -13,7 +13,7 @@ public class Session {
     private final String username;
     private final String password;
     private ChromeDriver driver;
-    private IntentController exec;
+    private Controller exec;
 
     public Session(String username, String password) {
         this.username = username;
@@ -26,7 +26,7 @@ public class Session {
     public void start() throws StartSessionException {
         if (this.driver == null) {
             this.driver = initDriver();
-            this.exec = new IntentController(this.driver, this.username, this.password);
+            this.exec = new Controller(this.driver, this.username, this.password);
         }
 
         try {
@@ -76,13 +76,14 @@ public class Session {
 
     // Account connection check.
     private boolean status() {
-        if (this.exec != null)
-            return !this.exec.checkConnection();
+        if (this.exec != null) {
+            return this.exec.checkConnection();
+        }
 
-        return true;
+        return false;
     }
 
-    public void employ() throws FailEmployException{
+    public void employ() throws FailEmployException {
         if (!this.exec.checkEmploymentState()) {
             System.out.println("ща устроимся");
             try {

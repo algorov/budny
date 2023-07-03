@@ -23,7 +23,10 @@ public class Manager {
     public void disableAccount(Account account) {
         account.addTask(Account.Intention.DISABLE);
         synchronization(account);
-        accounts.remove(account);
+
+        if (!account.getStatus()) {
+            accounts.remove(account);
+        }
     }
 
     // *** Intents. ***

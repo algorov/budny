@@ -33,8 +33,6 @@ public class Connection extends Intentionable {
 
     @Override
     public boolean status() {
-        this.driver.navigate().refresh();
-
         return !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
                 (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
     }
