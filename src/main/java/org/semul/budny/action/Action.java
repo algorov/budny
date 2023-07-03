@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class Action {
     private final ChromeDriver driver;
@@ -28,6 +27,7 @@ public class Action {
 
     public void signIn() {
         this.driver.get(Paths.URL);
+
         try {
             WebElement loginField = driver.findElement(new By.ByClassName(Paths.L_EFP01_LOGIN));
             loginField.clear();
@@ -44,30 +44,30 @@ public class Action {
     }
 
     public void signIn(String captchaUrl) {
-        assert this.driver.getCurrentUrl().equals(Paths.URL + Paths.LOGIN_PATH);
+        if ((Paths.URL + Paths.LOGIN_PATH).equals(this.driver.getCurrentUrl())) {
+            try {
+                WebElement loginField = driver.findElement(new By.ByXPath(Paths.L_EFP02_LOGIN));
+                loginField.clear();
+                loginField.sendKeys(this.username);
 
-        try {
-            WebElement loginField = driver.findElement(new By.ByXPath(Paths.L_EFP02_LOGIN));
-            loginField.clear();
-            loginField.sendKeys(this.username);
+                WebElement passwordField = driver.findElement(new By.ByXPath(Paths.L_EFP02_PASSWORD));
+                passwordField.clear();
+                passwordField.sendKeys(this.password);
 
-            WebElement passwordField = driver.findElement(new By.ByXPath(Paths.L_EFP02_PASSWORD));
-            passwordField.clear();
-            passwordField.sendKeys(this.password);
+                String captchaPath = Captcha.save(captchaUrl);
+                String code = CaptchaSolution.solution(captchaPath);
+                Captcha.delete(captchaPath);
 
-            String captchaPath = Captcha.save(captchaUrl);
-            String code = CaptchaSolution.solution(captchaPath);
-            Captcha.delete(captchaPath);
+                if (code != null) {
+                    WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.L_EFP01_CAPTCHA));
+                    captchaCodeField.clear();
+                    captchaCodeField.sendKeys(code);
+                }
 
-            if (code != null) {
-                WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.L_EFP01_CAPTCHA));
-                captchaCodeField.clear();
-                captchaCodeField.sendKeys(code);
+                WebElement authButton = driver.findElement(new By.ByXPath(Paths.L_BTNP02_AUTH));
+                authButton.click();
+            } catch (NoSuchElementException e) {
             }
-
-            WebElement authButton = driver.findElement(new By.ByXPath(Paths.L_BTNP02_AUTH));
-            authButton.click();
-        } catch (NoSuchElementException e) {
         }
     }
 
@@ -100,7 +100,7 @@ public class Action {
     public void employ() throws FailEmployException {
         this.driver.get(Paths.URL + Paths.MAP_PATH);
 
-        String vacancyUrl = null;
+        String vacancyUrl;
         String sectorPath = defSector();
         if (sectorPath != null) {
             vacancyUrl = defJobPath(sectorPath);
@@ -121,8 +121,6 @@ public class Action {
                     WebElement captchaEnterField = driver.findElement(new By.ByXPath(Paths.OI_EFP01_CAPTCHA));
                     captchaEnterField.click();
                     captchaEnterField.sendKeys(solution);
-
-                    System.out.println(checkEmploymentState());
                 } else {
                     throw new FailEmployException(">>> [Error] - No solving captcha!");
                 }
@@ -141,89 +139,56 @@ public class Action {
 
     public boolean checkEmploymentState() {
         if ((Paths.URL + Paths.OI_PATH).equals(this.driver.getCurrentUrl().split("\\?")[0])) {
-            // В случае, если мы после отработки метода устройства на работу.
-            this.driver.navigate().refresh();
-
             WebElement employStatusField = null;
             try {
-                employStatusField = this.driver.findElement(new By.ByXPath("/html/body/center/table/tbody/tr/td/table/tbody/tr/td/table[1]/tbody/tr/td/b"));
+                employStatusField = this.driver.findElement(new By.ByXPath(Paths.OI_FP01_EMPLOY_STATUS));
             } catch (NoSuchElementException e) {
             }
 
             if (employStatusField != null) {
-                if ("Вы устроены на работу!".equals(employStatusField.getText())) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return Paths.OI_EA_SUCCESS.equals(employStatusField.getText());
             } else {
                 return false;
             }
         } else {
             this.driver.get(Paths.URL + Paths.HOME_PATH);
 
-            if (getEmploymentCountdown() == 0) {
-                return false;
-            } else {
-                return true;
-            }
+            return getEmploymentCountdown() != 0;
         }
     }
 
-    public int getEmploymentCountdown() {
-        this.driver.get(Paths.URL + Paths.HOME_PATH);
-        assert (Paths.URL + Paths.HOME_PATH).equals(this.driver.getCurrentUrl());
-        System.out.print(">>> Get countdown -> ");
-
+    // If successful, it will return a positive number, otherwise - -1.
+    private int getEmploymentCountdown() {
         int countdown = 0;
 
         try {
-            String assertion = driver.findElement(
-                    new By.ByXPath("//*[@id=\"set_mobile_max_width\"]/div[2]/div[2]/div[2]/span")).getText();
+            String assertion = driver.findElement(new By.ByXPath(Paths.H_FP01_EMPLOY_STATUS)).getText();
+            if (!assertion.contains(Paths.H_EA_FREE)) {
+                if (assertion.contains(Paths.H_EA_FREE_SOON)) {
+                    ArrayList<String> assertionParts = new ArrayList<>(Arrays.asList(assertion.split(" ")));
+                    assertionParts.removeIf(part -> !part.matches("\\d+"));
+                    countdown = Integer.parseInt(assertionParts.get(0)) * 60;
+                } else {
+                    String[] assertionParts = assertion.split(" ");
+                    LocalTime timeEmployment = LocalTime.parse(assertionParts[assertionParts.length - 1]);
+                    LocalTime currentTime = LocalTime.now();
 
-            if (assertion.contains("Вы нигде не работаете.")) {
-                System.out.println(0);
-
-                return countdown;
-            } else if (assertion.contains("Последнее место работы:")) {
-                ArrayList<String> assertionParts = new ArrayList<>(Arrays.asList(assertion.split(" ")));
-                Iterator<String> iterator = assertionParts.iterator();
-
-                while (iterator.hasNext()) {
-                    if (!iterator.next().matches("\\d+")) {
-                        iterator.remove();
+                    int difference = (int) ChronoUnit.MINUTES.between(timeEmployment, currentTime);
+                    if (difference < 0) {
+                        difference += 1440;
                     }
+
+                    countdown = (60 - difference) * 60;
                 }
-
-                countdown = Integer.parseInt(assertionParts.get(0)) * 60;
-            } else {
-                String[] assertionParts = assertion.split(" ");
-
-                LocalTime timeEmployment = LocalTime.parse(assertionParts[assertionParts.length - 1]);
-                LocalTime currentTime = LocalTime.now();
-
-                int difference = (int) ChronoUnit.MINUTES.between(timeEmployment, currentTime);
-
-                if (difference < 0) {
-                    difference += 1440;
-                }
-
-                countdown = (60 - difference) * 60;
             }
         } catch (NoSuchElementException e) {
-            System.out.println("This field was not found.");
-
-            return countdown;
+            return -1;
         }
-
-        System.out.println(countdown);
 
         return countdown;
     }
 
     private String defSector() {
-        assert this.driver.getCurrentUrl().equals(Paths.URL + Paths.MAP_PATH);
-
         WebElement labelField = null;
         try {
             labelField = driver.findElement(new By.ByXPath(Paths.M_FP01_LABEL));
@@ -245,8 +210,6 @@ public class Action {
             }
 
             if (vacancyField != null) {
-
-                System.out.println(vacancyField.getAttribute("href"));
                 return vacancyField.getAttribute("href");
             }
         }

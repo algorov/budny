@@ -71,6 +71,17 @@ public class Paths {
     public static final String OI_FP01_CAPTCHA = "//*[@id=\"getjob_form\"]/img[1]";
     public static final String OI_EFP01_CAPTCHA = "//*[@id=\"code\"]";
     public static final String OI_BTNP01_EMPLOY = "//*[@id=\"wbtn\"]";
+    public static final String OI_FP01_EMPLOY_STATUS = "/html/body/center/table/tbody/tr/td/table/tbody/tr/td/table[1]/tbody/tr/td/b";
+
+    public static final String OI_EA_SUCCESS = "Вы устроены на работу!";
+
+
+    /* *** Home page *** */
+    // Paths for web elements (ByXPath).
+    public static final String H_FP01_EMPLOY_STATUS = "//*[@id=\"set_mobile_max_width\"]/div[2]/div[2]/div[2]/span";
+
+    public static final String H_EA_FREE = "Вы нигде не работаете.";
+    public static final String H_EA_FREE_SOON = "Последнее место работы:";
 
     public enum WorkType {
         MINING("sh"),

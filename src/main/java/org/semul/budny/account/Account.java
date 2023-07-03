@@ -79,6 +79,7 @@ public class Account extends Thread {
         try {
             this.session.employ();
         } catch (FailEmployException e) {
+            System.out.println(e.getMessage());
         }
     }
 

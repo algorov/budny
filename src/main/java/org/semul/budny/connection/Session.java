@@ -92,6 +92,12 @@ public class Session {
     }
 
     public void employ() throws FailEmployException{
-        this.exec.employ();
+        if (!this.exec.checkEmploymentState()) {
+            System.out.println("ща устроимся");
+            this.exec.employ();
+
+        } else {
+            System.out.println("Ты уже устроился");
+        }
     }
 }
