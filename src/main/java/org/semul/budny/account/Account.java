@@ -16,28 +16,25 @@ public class Account extends Thread {
     private final Queue<Intention> taskQueue;
 
     public enum Intention {
-        LAUNCH, DISABLE, EMPLOY
+        DISABLE, EMPLOY
     }
 
     public Account(String username, String password) {
         this.username = username;
         this.password = password;
-        this.status = true;
+        this.status = false;
         this.taskQueue = new LinkedList<>();
         this.completionStatus = false;
         this.session = null;
     }
 
-    public void addTask(Intention intention) {
-        this.taskQueue.add(intention);
-    }
-
     @Override
     public void run() {
+        launch();
+
         while (this.status) {
             if (this.taskQueue.size() > 0) {
                 switch (this.taskQueue.poll()) {
-                    case LAUNCH -> launch();
                     case DISABLE -> disable();
                     case EMPLOY -> employ();
                 }
@@ -51,6 +48,10 @@ public class Account extends Thread {
         }
     }
 
+    public void addTask(Intention intention) {
+        this.taskQueue.add(intention);
+    }
+
     // *** Intentions ***
     private void launch() {
         this.session = new Session(this.username, this.password);
@@ -61,6 +62,7 @@ public class Account extends Thread {
             System.out.println(e.getMessage());
             disable();
         } finally {
+            this.status = true;
             this.completionStatus = true;
         }
     }

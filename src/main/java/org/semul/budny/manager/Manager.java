@@ -11,15 +11,9 @@ public class Manager {
         this.accounts = new ArrayList<>();
     }
 
-    public Account createAccount(String username, String password) {
+    public void enableAccount(String username, String password) {
         Account account = new Account(username, password);
         account.start();
-
-        return account;
-    }
-
-    public void enableAccount(Account account) {
-        account.addTask(Account.Intention.LAUNCH);
         synchronization(account);
 
         if (account.getStatus())
@@ -33,11 +27,11 @@ public class Manager {
     }
 
     // *** Intents. ***
-    public void getJob(Account account) {
-        account.addTask(Account.Intention.EMPLOY);
+    public void getInfo(Account account) {
     }
 
-    public void getInfo(Account account) {
+    public void getJob(Account account) {
+        account.addTask(Account.Intention.EMPLOY);
     }
 
     // Waiting for a response from another (account) thread about the completion of the process.
@@ -54,15 +48,23 @@ public class Manager {
     }
 
     public Account getAccount(int index) {
-        return this.accounts.get(index);
+        if (accounts.size() != 0) {
+            return this.accounts.get(index);
+        }
+
+        return null;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("\n~~~ Manager ~~~\n");
 
-        for (Account account : accounts) {
-            stringBuilder.append(account.toString());
+        if (accounts.size() != 0) {
+            for (Account account : accounts) {
+                stringBuilder.append(account.toString());
+            }
+        } else {
+            stringBuilder.append(">>> [Empty] <<<");
         }
 
         return stringBuilder.toString();

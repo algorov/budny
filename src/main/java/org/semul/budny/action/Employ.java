@@ -14,90 +14,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Action {
-    private final ChromeDriver driver;
-    private final String username;
-    private final String password;
-
-    public Action(ChromeDriver driver, String username, String password) {
-        this.driver = driver;
-        this.username = username;
-        this.password = password;
+public class Employ extends Intentionable {
+    Employ(ChromeDriver driver, String username, String password) {
+        super(driver, username, password);
     }
 
-    public void signIn() {
-        this.driver.get(Paths.URL);
-
-        try {
-            WebElement loginField = driver.findElement(new By.ByClassName(Paths.LoginPageElement.EFP01_LOGIN.getValue()));
-            loginField.clear();
-            loginField.sendKeys(this.username);
-
-            WebElement passwordField = driver.findElement(new By.ByClassName(Paths.LoginPageElement.EFP01_PASSWORD.getValue()));
-            passwordField.clear();
-            passwordField.sendKeys(this.password);
-
-            WebElement authButton = driver.findElement(new By.ByClassName(Paths.LoginPageElement.BTNP01_AUTH.getValue()));
-            authButton.click();
-        } catch (NoSuchElementException e) {
-        }
-    }
-
-    public void signIn(String captchaUrl) {
-        if ((Paths.URL + Paths.PagePath.MAP.getValue()).equals(this.driver.getCurrentUrl())) {
-            try {
-                WebElement loginField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.EFP02_LOGIN.getValue()));
-                loginField.clear();
-                loginField.sendKeys(this.username);
-
-                WebElement passwordField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.EFP02_PASSWORD.getValue()));
-                passwordField.clear();
-                passwordField.sendKeys(this.password);
-
-                String captchaPath = Captcha.save(captchaUrl);
-                String code = CaptchaSolution.solution(captchaPath);
-                Captcha.delete(captchaPath);
-
-                if (code != null) {
-                    WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.EFP01_CAPTCHA.getValue()));
-                    captchaCodeField.clear();
-                    captchaCodeField.sendKeys(code);
-                }
-
-                WebElement authButton = driver.findElement(new By.ByXPath(Paths.LoginPageElement.BTNP02_AUTH.getValue()));
-                authButton.click();
-            } catch (NoSuchElementException e) {
-            }
-        }
-    }
-
-    public String getCaptchaUrl() {
-        WebElement captchaField = null;
-        try {
-            captchaField = driver.findElement(new By.ByXPath(Paths.OIPageElement.FP01_CAPTCHA.getValue()));
-        } catch (NoSuchElementException e) {
-            try {
-                captchaField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.FP01_CAPTCHA.getValue()));
-            } catch (NoSuchElementException q) {
-            }
-        }
-
-        return captchaField != null ? captchaField.getAttribute("src") : null;
-    }
-
-    public boolean checkConnection() {
-        if (this.driver != null) {
-            this.driver.navigate().refresh();
-
-            return !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
-                    (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
-        }
-
-        return false;
-    }
-
-    // Apparatus employed.
-    public void employ() throws FailEmployException {
+    public void execute() throws FailEmployException {
         this.driver.get(Paths.URL + Paths.PagePath.MAP.getValue());
 
         String vacancyUrl;
@@ -137,7 +59,8 @@ public class Action {
         }
     }
 
-    public boolean checkEmploymentState() {
+    @Override
+    public boolean status() {
         if ((Paths.URL + Paths.PagePath.OI.getValue()).equals(this.driver.getCurrentUrl().split("\\?")[0])) {
             WebElement employStatusField = null;
             try {
@@ -157,7 +80,6 @@ public class Action {
         }
     }
 
-    // If successful, it will return a positive number, otherwise - -1.
     private int getEmploymentCountdown() {
         int countdown = 0;
 
@@ -184,7 +106,7 @@ public class Action {
         } catch (NoSuchElementException e) {
             return -1;
         }
-
+        System.out.println(countdown);
         return countdown;
     }
 
@@ -216,5 +138,15 @@ public class Action {
         }
 
         return null;
+    }
+
+    private String getCaptchaUrl() {
+        WebElement captchaField = null;
+        try {
+            captchaField = driver.findElement(new By.ByXPath(Paths.OIPageElement.FP01_CAPTCHA.getValue()));
+        } catch (NoSuchElementException e) {
+        }
+
+        return captchaField != null ? captchaField.getAttribute("src") : null;
     }
 }

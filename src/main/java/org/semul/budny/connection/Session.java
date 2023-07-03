@@ -2,7 +2,8 @@ package org.semul.budny.connection;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.semul.budny.action.Action;
+import org.semul.budny.action.IntentController;
+import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
 
@@ -12,7 +13,7 @@ public class Session {
     private final String username;
     private final String password;
     private ChromeDriver driver;
-    private Action exec;
+    private IntentController exec;
 
     public Session(String username, String password) {
         this.username = username;
@@ -25,27 +26,14 @@ public class Session {
     public void start() throws StartSessionException {
         if (this.driver == null) {
             this.driver = initDriver();
-            this.exec = new Action(this.driver, this.username, this.password);
+            this.exec = new IntentController(this.driver, this.username, this.password);
         }
 
-        this.exec.signIn();
-
-        // Check for a connection to the account.
-        if (status()) {
-            String captchaUrl = this.exec.getCaptchaUrl();
-
-            if (captchaUrl != null) {
-                this.exec.signIn(captchaUrl);
-
-                if (status()) {
-                    throw new StartSessionException(">>> [Error] - Not valid data or captcha!");
-                }
-            } else {
-                throw new StartSessionException(">>> [Error] - Not valid data!");
-            }
+        try {
+            this.exec.signIn();
+        } catch (FailAuthorizationException e) {
+            throw new StartSessionException(e.getMessage());
         }
-
-        System.out.println(">>> [INFO] Successful authorization!");
     }
 
     // Disconnecting account's connection.
@@ -55,7 +43,10 @@ public class Session {
             this.driver = null;
         }
 
-        this.exec = null;
+        if (this.exec != null) {
+            this.exec.interrupt();
+            this.exec = null;
+        }
     }
 
     // Reconnect to account. If it fails, pushes for an exception.
@@ -94,7 +85,11 @@ public class Session {
     public void employ() throws FailEmployException{
         if (!this.exec.checkEmploymentState()) {
             System.out.println("ща устроимся");
-            this.exec.employ();
+            try {
+                this.exec.employ();
+            } catch (FailEmployException e) {
+                System.out.println(e.getMessage());
+            }
 
         } else {
             System.out.println("Ты уже устроился");
