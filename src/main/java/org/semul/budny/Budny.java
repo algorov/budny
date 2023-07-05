@@ -16,12 +16,6 @@ public class Budny {
 
         System.out.println(app.manager);
 
-        Account account = app.manager.getAccount(0);
-
-        if (account != null) {
-            app.manager.getJob(app.manager.getAccount(0));
-            app.signOut(0);
-        }
     }
 
     public void signIn(String username, String password) {

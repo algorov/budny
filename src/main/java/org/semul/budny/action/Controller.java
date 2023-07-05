@@ -29,6 +29,11 @@ public class Controller {
         return connect.status();
     }
 
+    public int getEmploymentCountdown() {
+        int a = this.employ.getEmploymentCountdown();
+        return a;
+    }
+
     public void employ() throws FailEmployException {
         this.employ.execute();
     }

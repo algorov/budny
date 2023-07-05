@@ -54,6 +54,10 @@ public class Employ extends Intentionable {
             } catch (NoSuchElementException e) {
                 throw new FailEmployException(">>> [Error] - NoSuchElementException!");
             }
+
+            if (!status()) {
+                throw new FailEmployException(">>> [Error] Captcha solved incorrectly!");
+            }
         } else {
             throw new FailEmployException(">>> [Error] - No vacancies!");
         }
@@ -80,7 +84,7 @@ public class Employ extends Intentionable {
         }
     }
 
-    private int getEmploymentCountdown() {
+    public int getEmploymentCountdown() {
         int countdown = 0;
 
         try {
@@ -106,7 +110,7 @@ public class Employ extends Intentionable {
         } catch (NoSuchElementException e) {
             return -1;
         }
-        System.out.println(countdown);
+
         return countdown;
     }
 
@@ -122,7 +126,6 @@ public class Employ extends Intentionable {
 
     private String defJobPath(String sectorPath) {
         for (Paths.WorkType item : Paths.WorkType.values()) {
-            System.out.println(Paths.PagePath.MAP);
             String url = Paths.URL + Paths.PagePath.MAP.getValue() + "?" + sectorPath + "&st=" + item.getValue();
             this.driver.get(url);
 
