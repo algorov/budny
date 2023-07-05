@@ -1,5 +1,6 @@
 package org.semul.budny.manager;
 
+import org.semul.budny.Budny;
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
 import org.semul.budny.helper.Wave;
@@ -7,6 +8,7 @@ import org.semul.budny.helper.Wave;
 import java.util.ArrayList;
 
 public class Manager {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
     private final ArrayList<Account> accounts;
 
     public Manager() {
@@ -14,59 +16,65 @@ public class Manager {
     }
 
     public void enableAccount(String username, String password) {
-        System.out.println(">>> [MANAGER] Enable account...");
+        logger.info("Enable account...");
+
         Account account = new Account(this, username, password);
         account.start();
         synchronization(account);
 
         if (account.getStatus()) {
             accounts.add(account);
-            System.out.println(">>> [MANAGER] Account has been added.");
+            logger.info("Account has been added.");
             planning(account);
         } else {
-            System.out.println(">>> [MANAGER] Account has not been added.");
+            logger.info("Account has not been added.");
         }
     }
 
     public void disableAccount(Account account) {
-        System.out.println(">>> [MANAGER] Disable account...");
+        logger.info("Disable account...");
         account.addTask(Account.Intention.DISABLE);
         synchronization(account);
 
         if (!account.getStatus()) {
-            System.out.println(">>> [MANAGER] Account has been disabled.");
+            logger.info("Account has been disabled.");
             accounts.remove(account);
         } else {
-            System.out.println(">>> [MANAGER] Account has not been disabled.");
+            logger.info("Account has not been disabled.");
         }
     }
 
     private void planning(Account account) {
-        System.out.println(">>> [MANAGER] Planning...");
+        logger.info("Planning...");
         AccountInfo accountInfo = getAccountInfo(account);
         createWave(account, Account.Intention.EMPLOY, accountInfo.employmentCountdown()).start();
+        logger.info("Done.");
     }
 
     public Wave createWave(Account account, Account.Intention intention, int countdown) {
+        logger.info("Create wave.");
         return new Wave(this, account, intention, countdown);
     }
 
     private AccountInfo getAccountInfo(Account account) {
-        System.out.println(">>> [MANAGER] Get account info...");
+        logger.info("Get account info...");
         account.addTask(Account.Intention.GET_INFO);
         synchronization(account);
+        logger.info("Done.");
 
         return account.getInfo();
     }
 
     // *** Intents. ***
     public synchronized void getJob(Account account) {
-        System.out.println(">>> [MANAGER] Signal to employ.");
+        logger.info("Signal to employ.");
         account.addTask(Account.Intention.EMPLOY);
     }
 
     // Waiting for a response from another (account) thread about the completion of the process.
     private void synchronization(Account account) {
+        logger.info("Synchronization...");
+
         while (!account.getCompletionStatus()) {
             try {
                 Thread.sleep(2333);
@@ -76,10 +84,12 @@ public class Manager {
         }
 
         account.changeCompletionStatus();
+        logger.info("Done.");
     }
 
     public Account getAccount(int index) {
-        System.out.println(">>> [MANAGER] Get account.");
+        logger.info("Get account.");
+
         if (accounts.size() != 0) {
             return this.accounts.get(index);
         }
@@ -89,6 +99,7 @@ public class Manager {
 
     @Override
     public String toString() {
+        logger.info("toString.");
         StringBuilder stringBuilder = new StringBuilder("\n~~~ Manager ~~~\n");
 
         if (accounts.size() != 0) {

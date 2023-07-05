@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Account extends Thread {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Account.class);
     private Manager manager;
     private final String username;
     private final String password;
@@ -23,7 +24,7 @@ public class Account extends Thread {
     }
 
     public Account(Manager manager, String username, String password) {
-        System.out.println(">>> [Account] Init...");
+        logger.info("Initialization...");
         this.manager = manager;
         this.username = username;
         this.password = password;
@@ -31,7 +32,7 @@ public class Account extends Thread {
         this.taskQueue = new LinkedList<>();
         this.completionStatus = false;
         this.session = null;
-        System.out.println(">>> [Account] Done.");
+        logger.info("Done.");
     }
 
     @Override
@@ -56,23 +57,22 @@ public class Account extends Thread {
     }
 
     public void addTask(Intention intention) {
-        System.out.println(">>> [Account] Adding a task " + intention);
+        logger.info("Adding a task '" + intention + "'...");
         this.taskQueue.add(intention);
-        System.out.println(">>> [Account] Done.");
+        logger.info("Done.");
     }
 
     // *** Intentions ***
     private void launch() {
-        System.out.println(">>> [Account] Launch...");
+        logger.info("Launch...");
         this.session = new Session(this.username, this.password);
 
         try {
             this.session.start();
             this.status = true;
-            System.out.println(">>> [Account] Successfully.");
+            logger.info("Successfully.");
         } catch (StartSessionException e) {
-            System.out.println(">>> [Account] Fail.");
-            System.out.println(e.getMessage());
+            logger.warn(e);
             disable();
         } finally {
             this.completionStatus = true;
@@ -80,7 +80,8 @@ public class Account extends Thread {
     }
 
     private void disable() {
-        System.out.println(">>> [Account] Disable...");
+        logger.info("Disable...");
+
         if (this.session != null) {
             this.session.interrupt();
             this.session = null;
@@ -89,57 +90,64 @@ public class Account extends Thread {
         this.status = false;
         this.completionStatus = true;
 
-        System.out.println(">>> [Account] Successfully.");
+        logger.info("Successfully.");
     }
 
     private void requestForInfo() {
-        System.out.println(">>> [Account] Request for information...");
+        logger.info("Request for information...");
+
         this.info = this.session.getAccountInfo();
         this.completionStatus = true;
 
-        System.out.println(">>> [Account] Successfully.");
+        logger.info("Successfully.");
     }
 
     private void employ() {
+        logger.info("Employ...");
+
         try {
             this.session.employ();
+            logger.info("Successfully.");
             this.manager.createWave(this, Intention.EMPLOY, 60 * 60);
         } catch (FailEmployException e) {
-            System.out.println(e.getMessage());
-            this.manager.createWave(this, Intention.EMPLOY, 0);
+            logger.error(e);
+            this.manager.createWave(this, Intention.EMPLOY, 5);
         }
     }
 
     public String getUsername() {
+        logger.info("Get username.");
         return this.username;
     }
 
     public String getPassword() {
+        logger.info("Get password.");
         return this.password;
     }
 
     public AccountInfo getInfo() {
-        System.out.println(">>> [Account] Get info.");
+        logger.info("Get info.");
         return this.info;
     }
 
     public boolean getStatus() {
-        System.out.println(">>> [Account] Get status.");
+        logger.info("Get status.");
         return this.status;
     }
 
     public boolean getCompletionStatus() {
-        System.out.println(">>> [Account] Get completion status.");
+        logger.info("Get completion status.");
         return this.completionStatus;
     }
 
     public void changeCompletionStatus() {
-        System.out.println(">>> [Account] Change completion status.");
+        logger.info("Change completion status.");
         this.completionStatus = !this.completionStatus;
     }
 
     @Override
     public String toString() {
+        logger.info("toString.");
         return "\n● Account:\n▬▬ username: " + this.username + ";\n" + "▬▬ password: " + this.password + ";\n"
                 + "▬▬ status: " + (this.status ? "launched" : "stopped") + ";\n";
     }

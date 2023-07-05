@@ -11,42 +11,45 @@ import org.semul.budny.exception.StartSessionException;
 import java.time.Duration;
 
 public class Session {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Session.class);
     private final String username;
     private final String password;
     private ChromeDriver driver;
     private Controller exec;
 
     public Session(String username, String password) {
-        System.out.println(">>> [Session] Init...");
+        logger.info("Initialization.");
+
         this.username = username;
         this.password = password;
         this.driver = null;
         this.exec = null;
-        System.out.println(">>> [Session] Done.");
+
+        logger.info("Done.");
     }
 
     // Connect to account. If it fails, pushes for an exception.
     public void start() throws StartSessionException {
         if (this.driver == null) {
-            System.out.println(">>> [Session] Start...");
+            logger.info("Start...");
             this.driver = initDriver();
             this.exec = new Controller(this.driver, this.username, this.password);
         } else {
-            System.out.println(">>> [Session] Restart...");
+            logger.info("Restart...");
         }
 
         try {
             this.exec.signIn();
-            System.out.println(">>> [Session] Successfully.");
+            logger.info("Successfully.");
         } catch (FailAuthorizationException e) {
-            System.out.println(">>> [Session] Fail.");
+            logger.error(e);
             throw new StartSessionException(e.getMessage());
         }
     }
 
     // Disconnecting account's connection.
     public void interrupt() {
-        System.out.println(">>> [Session] Interrupt...");
+        logger.info("Interrupt...");
 
         if (this.driver != null) {
             this.driver.close();
@@ -58,17 +61,17 @@ public class Session {
             this.exec = null;
         }
 
-        System.out.println(">>> [Session] Done.");
+        logger.info("Done.");
     }
 
     // Reconnect to account. If it fails, pushes for an exception.
     private void restore() throws StartSessionException {
-        System.out.println(">>> [Session] Restore.");
+        logger.info("Restore.");
         start();
     }
 
     private ChromeDriver initDriver() {
-        System.out.println(">>> [Session] Init driver...");
+        logger.info("Init driver...");
 
         String driverPath = System.getProperty("user.dir") + "/driver/chromedriver";
         System.setProperty("webdriver.chrome.driver", driverPath);
@@ -86,13 +89,14 @@ public class Session {
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
         driver.manage().timeouts().scriptTimeout(Duration.ofMillis(5000));
 
-        System.out.println(">>> [Session] Successfully...");
+        logger.info("Successfully.");
+
         return driver;
     }
 
     // Account connection check.
     private boolean status() {
-        System.out.println(">>> [Session] Check status.");
+        logger.info("Check status.");
 
         if (this.exec != null) {
             return this.exec.checkConnection();
@@ -102,20 +106,18 @@ public class Session {
     }
 
     public AccountInfo getAccountInfo() {
-        System.out.println(">>> [Session] Get account info.");
+        logger.info("Get account info.");
         return new AccountInfo(this.exec.getEmploymentCountdown());
     }
 
     public void employ() throws FailEmployException {
+        logger.info("Employ. CheckEmploymentState.");
+
         if (!this.exec.checkEmploymentState()) {
-            try {
-                this.exec.employ();
-            } catch (FailEmployException e) {
-                System.out.println(e.getMessage());
-            }
+            logger.info("Necessary.");
+            this.exec.employ();
         } else {
-            System.out.println("Ты уже устроился");
+            logger.info("Not necessary.");
         }
     }
-
 }
