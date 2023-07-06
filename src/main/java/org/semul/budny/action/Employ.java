@@ -15,28 +15,43 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Employ extends Intentionable {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Employ.class);
+
     Employ(ChromeDriver driver, String username, String password) {
         super(driver, username, password);
+        logger.info("Initialization.");
     }
 
     public void execute() throws FailEmployException {
+        logger.info("Execute.");
         this.driver.get(Paths.URL + Paths.PagePath.MAP.getValue());
 
         String vacancyUrl;
         String sectorPath = defSector();
+        logger.info("Sector path: " + sectorPath + ".");
+
         if (sectorPath != null) {
             vacancyUrl = defJobPath(sectorPath);
         } else {
-            throw new FailEmployException(">>> [Error] - Sector not defined!");
+            String message = "Sector not defined!";
+            logger.warn(message);
+            throw new FailEmployException(message);
         }
+
+        logger.info("Vacancy URL: " + vacancyUrl + ".");
 
         if (vacancyUrl != null) {
             driver.get(vacancyUrl);
 
             String quessCaptchaUrl = getCaptchaUrl();
+            logger.info("Quess captcha URL: " + quessCaptchaUrl + ".");
+
             if (quessCaptchaUrl != null) {
                 String localPath = Captcha.save(quessCaptchaUrl);
+                logger.info("Captcha local PATH: " + localPath + ".");
+
                 String solution = CaptchaSolution.solution(localPath);
+                logger.info("Captcha colution: " + solution + ".");
                 Captcha.delete(localPath);
 
                 if (solution != null) {
@@ -44,7 +59,9 @@ public class Employ extends Intentionable {
                     captchaEnterField.click();
                     captchaEnterField.sendKeys(solution);
                 } else {
-                    throw new FailEmployException(">>> [Error] - No solving captcha!");
+                    String message = "No solving captcha!";
+                    logger.warn(message);
+                    throw new FailEmployException(message);
                 }
             }
 
@@ -52,19 +69,30 @@ public class Employ extends Intentionable {
                 WebElement employButton = driver.findElement(new By.ByXPath(Paths.OIPageElement.BTNP01_EMPLOY.getValue()));
                 employButton.click();
             } catch (NoSuchElementException e) {
-                throw new FailEmployException(">>> [Error] - NoSuchElementException!");
+                String message = "NoSuchElementException!";
+                logger.warn(message);
+                throw new FailEmployException(message);
             }
 
-            if (!status()) {
-                throw new FailEmployException(">>> [Error] Captcha solved incorrectly!");
+            boolean status = status();
+            logger.info("Employ status: " + status + ".");
+
+            if (!status) {
+                String message = "Captcha solved incorrectly!";
+                logger.warn(message);
+                throw new FailEmployException(message);
             }
         } else {
-            throw new FailEmployException(">>> [Error] - No vacancies!");
+            String message = "No vacancies!";
+            logger.warn(message);
+            throw new FailEmployException(message);
         }
     }
 
     @Override
     public boolean status() {
+        logger.info("Get status.");
+
         if ((Paths.URL + Paths.PagePath.OI.getValue()).equals(this.driver.getCurrentUrl().split("\\?")[0])) {
             WebElement employStatusField = null;
             try {
@@ -79,12 +107,15 @@ public class Employ extends Intentionable {
             }
         } else {
             this.driver.get(Paths.URL + Paths.PagePath.HOME.getValue());
-
-            return getEmploymentCountdown() != 0;
+            int employmetnCountdown = getEmploymentCountdown();
+            logger.info("Employment countdown: " + employmetnCountdown + ".");
+            return employmetnCountdown != 0;
         }
     }
 
     public int getEmploymentCountdown() {
+        logger.info("Get employment countdown.");
+
         int countdown = 0;
 
         try {
@@ -115,16 +146,21 @@ public class Employ extends Intentionable {
     }
 
     private String defSector() {
+        logger.info("Def sector.");
+
         WebElement labelField = null;
         try {
             labelField = driver.findElement(new By.ByXPath(Paths.MapPageElement.FP01_LABEL.getValue()));
         } catch (NoSuchElementException e) {
+            logger.warn(e);
         }
 
         return labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
     }
 
     private String defJobPath(String sectorPath) {
+        logger.info("Def job PATH.");
+
         for (Paths.WorkType item : Paths.WorkType.values()) {
             String url = Paths.URL + Paths.PagePath.MAP.getValue() + "?" + sectorPath + "&st=" + item.getValue();
             this.driver.get(url);
@@ -133,6 +169,7 @@ public class Employ extends Intentionable {
             try {
                 vacancyField = this.driver.findElement(new By.ByLinkText("»»»"));
             } catch (NoSuchElementException e) {
+                logger.warn(e);
             }
 
             if (vacancyField != null) {
@@ -144,10 +181,13 @@ public class Employ extends Intentionable {
     }
 
     private String getCaptchaUrl() {
+        logger.info("Get captcha URL.");
+
         WebElement captchaField = null;
         try {
             captchaField = driver.findElement(new By.ByXPath(Paths.OIPageElement.FP01_CAPTCHA.getValue()));
         } catch (NoSuchElementException e) {
+            logger.warn(e);
         }
 
         return captchaField != null ? captchaField.getAttribute("src") : null;

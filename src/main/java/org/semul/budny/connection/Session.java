@@ -97,12 +97,14 @@ public class Session {
     // Account connection check.
     private boolean status() {
         logger.info("Check status.");
+        boolean connectionStatus = false;
 
         if (this.exec != null) {
-            return this.exec.checkConnection();
+            connectionStatus = this.exec.checkConnection();
         }
 
-        return false;
+        logger.info("Connection status: " + connectionStatus + ".");
+        return connectionStatus;
     }
 
     public AccountInfo getAccountInfo() {
@@ -111,7 +113,7 @@ public class Session {
     }
 
     public void employ() throws FailEmployException {
-        logger.info("Employ. CheckEmploymentState.");
+        logger.info("Employ.");
 
         if (!this.exec.checkEmploymentState()) {
             logger.info("Necessary.");

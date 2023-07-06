@@ -10,34 +10,51 @@ import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.heroeswm.Paths;
 
 public class Connection extends Intentionable {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Connection.class);
+
     Connection(ChromeDriver driver, String username, String password) {
         super(driver, username, password);
+        logger.info("Initialization.");
     }
 
     public void execute() throws FailAuthorizationException {
+        logger.info("Execute.");
         signIn();
 
-        if (!status()) {
+        boolean connectionStatus = status();
+        logger.info("Connection status: " + connectionStatus + ".");
+        if (!connectionStatus) {
             String captchaUrl = getCaptchaUrl();
+            logger.info("Captcha URL: " + captchaUrl + ".");
+
             if (captchaUrl != null) {
                 this.signIn(captchaUrl);
 
                 if (!status()) {
-                    throw new FailAuthorizationException(">>> [Error] - Not valid data or captcha!");
+                    String message = "Not valid data or captcha!";
+                    logger.warn(message);
+                    throw new FailAuthorizationException(message);
                 }
             } else {
-                throw new FailAuthorizationException(">>> [Error] - Not valid data!");
+                String message = "Not valid data!";
+                logger.warn(message);
+                throw new FailAuthorizationException(message);
             }
         }
     }
 
     @Override
     public boolean status() {
-        return !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
+        logger.info("Def status.");
+        boolean status = !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
                 (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
+        logger.info("Status: " + status + ".");
+
+        return status;
     }
 
     private void signIn() {
+        logger.info("Sign in.");
         this.driver.get(Paths.URL);
 
         try {
@@ -52,6 +69,7 @@ public class Connection extends Intentionable {
             WebElement authButton = driver.findElement(new By.ByClassName(Paths.LoginPageElement.BTNP01_AUTH.getValue()));
             authButton.click();
         } catch (NoSuchElementException e) {
+            logger.warn(e);
         }
     }
 
@@ -66,7 +84,9 @@ public class Connection extends Intentionable {
             passwordField.sendKeys(password);
 
             String captchaPath = Captcha.save(captchaUrl);
+            logger.info("Captcha PATH: " + captchaPath + ".");
             String code = CaptchaSolution.solution(captchaPath);
+            logger.info("Captcha solution: " + code + ".");
             Captcha.delete(captchaPath);
 
             if (code != null) {
@@ -78,14 +98,17 @@ public class Connection extends Intentionable {
             WebElement authButton = driver.findElement(new By.ByXPath(Paths.LoginPageElement.BTNP02_AUTH.getValue()));
             authButton.click();
         } catch (NoSuchElementException e) {
+            logger.warn(e);
         }
     }
 
     private String getCaptchaUrl() {
+        logger.info("Get captcha URL.");
         WebElement captchaField = null;
         try {
             captchaField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.FP01_CAPTCHA.getValue()));
         } catch (NoSuchElementException e) {
+            logger.warn(e);
         }
 
         return captchaField != null ? captchaField.getAttribute("src") : null;

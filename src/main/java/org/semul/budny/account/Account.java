@@ -49,7 +49,7 @@ public class Account extends Thread {
             }
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -72,7 +72,7 @@ public class Account extends Thread {
             this.status = true;
             logger.info("Successfully.");
         } catch (StartSessionException e) {
-            logger.warn(e);
+            logger.error(e);
             disable();
         } finally {
             this.completionStatus = true;
@@ -108,10 +108,10 @@ public class Account extends Thread {
         try {
             this.session.employ();
             logger.info("Successfully.");
-            this.manager.createWave(this, Intention.EMPLOY, 60 * 60);
+            this.manager.createWave(this, Intention.EMPLOY, 60 * 60).start();
         } catch (FailEmployException e) {
-            logger.error(e);
-            this.manager.createWave(this, Intention.EMPLOY, 5);
+            logger.warn(e);
+            this.manager.createWave(this, Intention.EMPLOY, 5).start();
         }
     }
 
@@ -132,11 +132,13 @@ public class Account extends Thread {
 
     public boolean getStatus() {
         logger.info("Get status.");
+        logger.info("Status: " + this.status + ".");
         return this.status;
     }
 
     public boolean getCompletionStatus() {
         logger.info("Get completion status.");
+        logger.info("Completion status: " + this.completionStatus + ".");
         return this.completionStatus;
     }
 

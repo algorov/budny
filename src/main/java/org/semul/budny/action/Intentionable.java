@@ -3,6 +3,7 @@ package org.semul.budny.action;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 public abstract class Intentionable {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Intentionable.class);
     protected ChromeDriver driver;
     protected String username;
     protected String password;
@@ -16,8 +17,12 @@ public abstract class Intentionable {
     public abstract boolean status();
 
     public void interrupt() {
+        logger.info("Interrupt...");
+
         this.driver = null;
         this.username = null;
         this.password = null;
+
+        logger.info("Done.");
     }
 }

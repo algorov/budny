@@ -1,6 +1,5 @@
 package org.semul.budny.manager;
 
-import org.semul.budny.Budny;
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
 import org.semul.budny.helper.Wave;
@@ -12,7 +11,9 @@ public class Manager {
     private final ArrayList<Account> accounts;
 
     public Manager() {
+        logger.info("Initialization...");
         this.accounts = new ArrayList<>();
+        logger.info("Done.");
     }
 
     public void enableAccount(String username, String password) {
@@ -61,6 +62,7 @@ public class Manager {
         account.addTask(Account.Intention.GET_INFO);
         synchronization(account);
         logger.info("Done.");
+        logger.info("Account info: " + account.getInfo());
 
         return account.getInfo();
     }
