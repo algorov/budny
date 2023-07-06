@@ -23,12 +23,13 @@ public class Wave extends Thread {
 
     @Override
     public void run() {
-        logger.info("Signal to the manager about '" + intent + "' in " + this.countdown + " seconds.");
         this.countdown = Wait.getCorrectTime(this.countdown, 0.05F);
 
         if (Account.Intention.EMPLOY == this.intent) {
             this.countdown += 60000;
         }
+
+        logger.info("Signal to the manager about '" + intent + "' in " + this.countdown + " seconds.");
 
         try {
             Thread.sleep(this.countdown);

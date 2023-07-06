@@ -87,6 +87,7 @@ public class Account extends Thread {
             this.session = null;
         }
 
+        this.manager = null;
         this.status = false;
         this.completionStatus = true;
 
@@ -114,7 +115,7 @@ public class Account extends Thread {
             this.manager.createWave(this, Intention.EMPLOY, 5).start();
         } catch (StartSessionException ex) {
             logger.warn(ex);
-            manager.disableAccount(this);
+            this.manager.disableAccount(this);
         }
     }
 
