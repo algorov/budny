@@ -112,7 +112,18 @@ public class Session {
         return new AccountInfo(this.exec.getEmploymentCountdown());
     }
 
-    public void employ() throws FailEmployException {
+    public void employ() throws FailEmployException, StartSessionException {
+        if (status()) {
+            employAction();
+        } else {
+            logger.warn("Connection broken.");
+            restore();
+            employAction();
+        }
+
+    }
+
+    private void employAction() throws FailEmployException{
         logger.info("Employ.");
 
         if (!this.exec.checkEmploymentState()) {

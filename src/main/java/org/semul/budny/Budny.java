@@ -17,7 +17,6 @@ public class Budny {
         Budny app = new Budny();
         app.signIn(args[0], args[1]);
 
-        System.out.println(app.manager);
         while (true) {
 
         }

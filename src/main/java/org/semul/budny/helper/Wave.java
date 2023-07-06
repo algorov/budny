@@ -31,10 +31,12 @@ public class Wave extends Thread {
             throw new RuntimeException(e);
         }
 
-        logger.info("Signal to the manager about '" + intent + '.');
+        if (account.getStatus()) {
+            logger.info("Signal to the manager about '" + intent + '.');
 
-        if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
-            manager.getJob(account);
+            if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
+                manager.getJob(account);
+            }
         }
 
         clear();

@@ -112,6 +112,9 @@ public class Account extends Thread {
         } catch (FailEmployException e) {
             logger.warn(e);
             this.manager.createWave(this, Intention.EMPLOY, 5).start();
+        } catch (StartSessionException ex) {
+            logger.warn(ex);
+            manager.disableAccount(this);
         }
     }
 
