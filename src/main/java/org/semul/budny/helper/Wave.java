@@ -10,7 +10,7 @@ public class Wave extends Thread {
     private Manager manager;
     private Account account;
     private Account.Intention intent;
-    private final int countdown;
+    private int countdown;
 
     public Wave(Manager manager, Account account, Account.Intention intent, int countdown) {
         logger.info("Initialization...");
@@ -24,9 +24,14 @@ public class Wave extends Thread {
     @Override
     public void run() {
         logger.info("Signal to the manager about '" + intent + "' in " + this.countdown + " seconds.");
+        this.countdown = Wait.getCorrectTime(this.countdown, 0.05F);
+
+        if (Account.Intention.EMPLOY == this.intent) {
+            this.countdown += 60000;
+        }
 
         try {
-            Thread.sleep(countdown * 1000L);
+            Thread.sleep(this.countdown);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
