@@ -1,6 +1,7 @@
 package org.semul.budny;
 
 
+import org.semul.budny.exception.ExeptionCount;
 import org.semul.budny.manager.Manager;
 
 public class Budny {
@@ -17,10 +18,10 @@ public class Budny {
         Budny app = new Budny();
         app.signIn(args[0], args[1]);
 
-        while (true) {
-
+        while (app.manager.getActiveAccounts() > 0 && ExeptionCount.count <= 5) {
         }
 
+        app.manager.interrupt();
     }
 
     public void signIn(String username, String password) {

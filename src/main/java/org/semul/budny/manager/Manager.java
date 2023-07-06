@@ -8,12 +8,22 @@ import java.util.ArrayList;
 
 public class Manager {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
-    private final ArrayList<Account> accounts;
+    private ArrayList<Account> accounts;
 
     public Manager() {
         logger.info("Initialization...");
         this.accounts = new ArrayList<>();
         logger.info("Done.");
+    }
+
+    public void interrupt() {
+        if (this.accounts.size() > 0) {
+            for (Account a : accounts) {
+                a.interrupt();
+            }
+        }
+
+        this.accounts = null;
     }
 
     public void enableAccount(String username, String password) {
@@ -97,6 +107,10 @@ public class Manager {
         }
 
         return null;
+    }
+
+    public int getActiveAccounts() {
+        return this.accounts.size();
     }
 
     @Override
