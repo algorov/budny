@@ -1,4 +1,4 @@
-package org.semul.budny.action;
+package org.semul.budny.event;
 
 import org.openqa.selenium.chrome.ChromeDriver;
 
@@ -14,9 +14,7 @@ public abstract class Intentionable {
         this.password = password;
     }
 
-    public abstract boolean status();
-
-    public void interrupt() {
+    public void cleanup() {
         logger.info("Interrupt...");
 
         this.driver = null;

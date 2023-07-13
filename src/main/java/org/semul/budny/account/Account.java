@@ -23,8 +23,13 @@ public class Account extends Thread {
         DISABLE, GET_INFO, EMPLOY
     }
 
-    public Account(Manager manager, String username, String password) {
+    public static synchronized Account getInstance(Manager manager, String username, String password) {
+        return new Account(manager, username, password);
+    }
+
+    private Account(Manager manager, String username, String password) {
         logger.info("Initialization...");
+
         this.manager = manager;
         this.username = username;
         this.password = password;
@@ -32,6 +37,7 @@ public class Account extends Thread {
         this.taskQueue = new LinkedList<>();
         this.completionStatus = false;
         this.session = null;
+
         logger.info("Done.");
     }
 
@@ -43,7 +49,7 @@ public class Account extends Thread {
             if (this.taskQueue.size() > 0) {
                 switch (this.taskQueue.poll()) {
                     case DISABLE -> disable();
-                    case GET_INFO -> requestForInfo();
+                    case GET_INFO -> updateInfo();
                     case EMPLOY -> employ();
                 }
             }
@@ -65,11 +71,13 @@ public class Account extends Thread {
     // *** Intentions ***
     private void launch() {
         logger.info("Launch...");
-        this.session = new Session(this.username, this.password);
+
+        this.session = Session.getInstance(this.username, this.password);
 
         try {
             this.session.start();
             this.status = true;
+
             logger.info("Successfully.");
         } catch (StartSessionException e) {
             logger.error(e);
@@ -94,13 +102,11 @@ public class Account extends Thread {
         logger.info("Successfully.");
     }
 
-    private void requestForInfo() {
-        logger.info("Request for information...");
+    private void updateInfo() {
+        logger.info("Update information.");
 
         this.info = this.session.getAccountInfo();
         this.completionStatus = true;
-
-        logger.info("Successfully.");
     }
 
     private void employ() {
@@ -109,12 +115,10 @@ public class Account extends Thread {
         try {
             this.session.employ();
             logger.info("Successfully.");
-            this.manager.createWave(this, Intention.EMPLOY, 60 * 60).start();
-        } catch (FailEmployException e) {
-            logger.warn(e);
-            this.manager.createWave(this, Intention.EMPLOY, 5).start();
-        } catch (StartSessionException ex) {
-            logger.warn(ex);
+        } catch (FailEmployException employEx) {
+            logger.warn(employEx);
+        } catch (StartSessionException sessionEx) {
+            logger.warn(sessionEx);
             this.manager.disableAccount(this);
         }
     }
@@ -135,13 +139,11 @@ public class Account extends Thread {
     }
 
     public boolean getStatus() {
-        logger.info("Get status.");
         logger.info("Status: " + this.status + ".");
         return this.status;
     }
 
     public boolean getCompletionStatus() {
-        logger.info("Get completion status.");
         logger.info("Completion status: " + this.completionStatus + ".");
         return this.completionStatus;
     }

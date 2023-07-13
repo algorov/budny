@@ -9,7 +9,7 @@ public class Budny {
     private final Manager manager;
 
     public Budny() {
-        this.manager = new Manager();
+        this.manager = Manager.getInstance();
     }
 
     public static void main(String[] args) {
@@ -21,7 +21,7 @@ public class Budny {
         while (app.manager.getActiveAccounts() > 0 && ExeptionCount.count <= 5) {
         }
 
-        app.manager.interrupt();
+        app.manager.halt();
     }
 
     public void signIn(String username, String password) {

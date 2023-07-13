@@ -1,4 +1,4 @@
-package org.semul.budny.action;
+package org.semul.budny.event;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -23,6 +23,7 @@ public class Connection extends Intentionable {
 
         boolean connectionStatus = status();
         logger.info("Connection status: " + connectionStatus + ".");
+
         if (!connectionStatus) {
             String captchaUrl = getCaptchaUrl();
             logger.info("Captcha URL: " + captchaUrl + ".");
@@ -43,11 +44,13 @@ public class Connection extends Intentionable {
         }
     }
 
-    @Override
     public boolean status() {
-        logger.info("Def status.");
+        logger.info("Def status...");
+
+        this.driver.get(Paths.URL);
         boolean status = !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
                 (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
+
         logger.info("Status: " + status + ".");
 
         return status;
@@ -104,6 +107,7 @@ public class Connection extends Intentionable {
 
     private String getCaptchaUrl() {
         logger.info("Get captcha URL.");
+
         WebElement captchaField = null;
         try {
             captchaField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.FP01_CAPTCHA.getValue()));

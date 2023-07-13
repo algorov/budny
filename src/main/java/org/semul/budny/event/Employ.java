@@ -1,4 +1,4 @@
-package org.semul.budny.action;
+package org.semul.budny.event;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -89,7 +89,6 @@ public class Employ extends Intentionable {
         }
     }
 
-    @Override
     public boolean status() {
         logger.info("Get status.");
 
@@ -97,7 +96,7 @@ public class Employ extends Intentionable {
             WebElement employStatusField = null;
             try {
                 employStatusField = this.driver.findElement(new By.ByXPath(Paths.OIPageElement.FP01_EMPLOY_STATUS.getValue()));
-            } catch (NoSuchElementException e) {
+            } catch (NoSuchElementException ignored) {
             }
 
             if (employStatusField != null) {
@@ -107,18 +106,23 @@ public class Employ extends Intentionable {
             }
         } else {
             this.driver.get(Paths.URL + Paths.PagePath.HOME.getValue());
-            int employmetnCountdown = getEmploymentCountdown();
-            logger.info("Employment countdown: " + employmetnCountdown + ".");
-            return employmetnCountdown != 0;
+            int workEndCountdown = getWorkEndCountdown();
+
+            logger.info("Work end countdown: " + workEndCountdown + " sec.");
+
+            return workEndCountdown != 0;
         }
     }
 
-    public int getEmploymentCountdown() {
-        logger.info("Get employment countdown.");
+    // Предзназначен для подсчета обратного времени, чтобы закончить работу. Если не удалось определить - то возвращает -1.
+    public int getWorkEndCountdown() {
+        logger.info("Get work end countdown.");
 
         int countdown = 0;
 
         try {
+            this.driver.get(Paths.URL + Paths.PagePath.HOME.getValue());
+
             String assertion = driver.findElement(new By.ByXPath(Paths.HomePageElement.FP01_EMPLOY_STATUS.getValue())).getText();
             if (!assertion.contains(Paths.HomePageElement.EA_FREE.getValue())) {
                 if (assertion.contains(Paths.HomePageElement.EA_FREE_SOON.getValue())) {
@@ -145,6 +149,7 @@ public class Employ extends Intentionable {
         return countdown;
     }
 
+    // Возвращет сеткор или null.
     private String defSector() {
         logger.info("Def sector.");
 
@@ -158,6 +163,7 @@ public class Employ extends Intentionable {
         return labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
     }
 
+    // Возвращет path или null.
     private String defJobPath(String sectorPath) {
         logger.info("Def job PATH.");
 
@@ -180,6 +186,7 @@ public class Employ extends Intentionable {
         return null;
     }
 
+    // Возвращет url или null.
     private String getCaptchaUrl() {
         logger.info("Get captcha URL.");
 

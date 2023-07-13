@@ -1,6 +1,6 @@
 package org.semul.budny.helper;
 
-public class Wait {
+public class Countdown {
     // Returns the time in milliseconds.
     public static synchronized int getCorrectTime(int second) {
         float maxRandomDispersion = 1F;

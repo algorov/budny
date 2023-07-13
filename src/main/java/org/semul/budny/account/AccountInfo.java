@@ -1,8 +1,8 @@
 package org.semul.budny.account;
 
-public record AccountInfo(int employmentCountdown) {
+public record AccountInfo(int workEndCountdown) {
     @Override
     public String toString() {
-        return "Employment countdown: " + this.employmentCountdown + ".";
+        return "\n▬▬ Work end countdown: " + this.workEndCountdown + " sec;\n";
     }
 }

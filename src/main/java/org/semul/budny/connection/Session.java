@@ -3,7 +3,7 @@ package org.semul.budny.connection;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.semul.budny.account.AccountInfo;
-import org.semul.budny.action.Controller;
+import org.semul.budny.event.EventController;
 import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
@@ -15,9 +15,13 @@ public class Session {
     private final String username;
     private final String password;
     private ChromeDriver driver;
-    private Controller exec;
+    private EventController exec;
 
-    public Session(String username, String password) {
+    public static Session getInstance(String username, String password) {
+        return new Session(username, password);
+    }
+
+    private Session(String username, String password) {
         logger.info("Initialization.");
 
         this.username = username;
@@ -33,7 +37,7 @@ public class Session {
         if (this.driver == null) {
             logger.info("Start...");
             this.driver = initDriver();
-            this.exec = new Controller(this.driver, this.username, this.password);
+            this.exec = new EventController(this.driver, this.username, this.password);
         } else {
             logger.info("Restart...");
         }
@@ -109,7 +113,7 @@ public class Session {
 
     public AccountInfo getAccountInfo() {
         logger.info("Get account info.");
-        return new AccountInfo(this.exec.getEmploymentCountdown());
+        return new AccountInfo(this.exec.getWorkEndCountdown());
     }
 
     public void employ() throws FailEmployException, StartSessionException {
@@ -123,10 +127,10 @@ public class Session {
 
     }
 
-    private void employAction() throws FailEmployException{
+    private void employAction() throws FailEmployException {
         logger.info("Employ.");
 
-        if (!this.exec.checkEmploymentState()) {
+        if (!this.exec.checkWorkState()) {
             logger.info("Necessary.");
             this.exec.employ();
         } else {
