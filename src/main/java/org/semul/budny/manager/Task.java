@@ -5,19 +5,19 @@ import org.semul.budny.helper.Countdown;
 
 import java.util.Objects;
 
-public class Wave extends Thread {
-    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Wave.class);
-    public static volatile int countWave = 0;
+public class Task extends Thread {
+    public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Task.class);
+    public static volatile int taskCount = 0;
     private Manager manager;
     private Account account;
     private Account.Intention intent;
     private int countdown;
 
-    public static Wave getInstance(Manager manager, Account account, Account.Intention intent, int countdown) {
-        return new Wave(manager, account, intent, countdown);
+    public static Task getInstance(Manager manager, Account account, Account.Intention intent, int countdown) {
+        return new Task(manager, account, intent, countdown);
     }
 
-    private Wave(Manager manager, Account account, Account.Intention intent, int countdown) {
+    private Task(Manager manager, Account account, Account.Intention intent, int countdown) {
         logger.info("Initialization...");
 
         this.manager = manager;
@@ -32,7 +32,7 @@ public class Wave extends Thread {
     public void run() {
         this.countdown = Countdown.getCorrectTime(this.countdown, 0.05F);
         logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds.");
-        countWave++;
+        taskCount++;
 
         try {
             Thread.sleep(this.countdown);
@@ -40,7 +40,7 @@ public class Wave extends Thread {
             throw new RuntimeException(e);
         }
 
-        if (account.getStatus()) {
+        if (account.isLive()) {
             logger.info("Signal to the manager about '" + intent + '.');
 
             if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
@@ -48,7 +48,7 @@ public class Wave extends Thread {
             }
         }
 
-        countWave--;
+        taskCount--;
         clear();
     }
 

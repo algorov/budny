@@ -46,12 +46,9 @@ public class Account extends Thread {
         launch();
 
         while (this.status) {
+            System.out.println(this.taskQueue.size());
             if (this.taskQueue.size() > 0) {
-                switch (this.taskQueue.poll()) {
-                    case DISABLE -> disable();
-                    case GET_INFO -> updateInfo();
-                    case EMPLOY -> employ();
-                }
+                postRequest(this.taskQueue.poll());
             }
 
             try {
@@ -62,17 +59,10 @@ public class Account extends Thread {
         }
     }
 
-    public void addTask(Intention intention) {
-        logger.info("Adding a task '" + intention + "'...");
-        this.taskQueue.add(intention);
-        logger.info("Done.");
-    }
-
-    // *** Intentions ***
     private void launch() {
         logger.info("Launch...");
 
-        this.session = Session.getInstance(this.username, this.password);
+        this.session = Session.getInstance(this, this.username, this.password);
 
         try {
             this.session.start();
@@ -102,25 +92,38 @@ public class Account extends Thread {
         logger.info("Successfully.");
     }
 
-    private void updateInfo() {
-        logger.info("Update information.");
-
-        this.info = this.session.getAccountInfo();
-        this.completionStatus = true;
+    public void addTask(Intention intent) {
+        logger.info("Adding a task '" + intent + "'...");
+        this.taskQueue.add(intent);
+        logger.info("Done.");
     }
 
-    private void employ() {
-        logger.info("Employ...");
-
+    private void postRequest(Intention intent) {
+        logger.info("POST: " + intent);
         try {
-            this.session.employ();
-            logger.info("Successfully.");
+            this.session.getRequest(intent);
         } catch (FailEmployException employEx) {
             logger.warn(employEx);
         } catch (StartSessionException sessionEx) {
-            logger.warn(sessionEx);
-            this.manager.disableAccount(this);
+            logger.error(sessionEx);
+            this.manager.delAccount(this);
         }
+
+        this.completionStatus = true;
+    }
+
+    public boolean isLive() {
+        logger.info("Alive: " + this.status + ".");
+        return this.status;
+    }
+
+    public AccountInfo getInfo() {
+        logger.info("Get info.");
+        return this.info;
+    }
+
+    public void setInfo(AccountInfo info) {
+        this.info = info;
     }
 
     public String getUsername() {
@@ -133,30 +136,21 @@ public class Account extends Thread {
         return this.password;
     }
 
-    public AccountInfo getInfo() {
-        logger.info("Get info.");
-        return this.info;
-    }
-
-    public boolean getStatus() {
-        logger.info("Status: " + this.status + ".");
-        return this.status;
-    }
-
-    public boolean getCompletionStatus() {
+    public boolean isCompletion() {
         logger.info("Completion status: " + this.completionStatus + ".");
-        return this.completionStatus;
-    }
 
-    public void changeCompletionStatus() {
-        logger.info("Change completion status.");
-        this.completionStatus = !this.completionStatus;
+        if (this.completionStatus) {
+            this.completionStatus = false;
+            return true;
+        } else return false;
     }
 
     @Override
     public String toString() {
         logger.info("toString.");
-        return "\n● Account:\n▬▬ username: " + this.username + ";\n" + "▬▬ password: " + this.password + ";\n"
-                + "▬▬ status: " + (this.status ? "launched" : "stopped") + ";\n";
+        return "\n● Account:\n" +
+                "▬▬ username: " + this.username + ";\n" +
+                "▬▬ password: " + this.password + ";\n" +
+                "▬▬ status: " + (this.status ? "launched" : "stopped") + ";\n";
     }
 }

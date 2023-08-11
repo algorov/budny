@@ -143,8 +143,10 @@ public class Employ extends Intentionable {
                 }
             }
         } catch (NoSuchElementException e) {
-            return -1;
+            countdown = -1;
         }
+
+        System.out.println("Countdown = " + countdown);
 
         return countdown;
     }

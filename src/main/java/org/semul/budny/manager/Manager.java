@@ -21,11 +21,10 @@ public class Manager extends Thread {
         logger.info("Done.");
     }
 
-    // [IDEA] Обновляем инфу аккаунта, парсим, сопоставляем, если инфа всё же обновилась, то создаем event.
     @Override
     public void run() {
         while (this.status) {
-            if (Wave.countWave == 0) {
+            if (Task.taskCount == 0) {
                 planning();
             }
 
@@ -39,14 +38,14 @@ public class Manager extends Thread {
         cleanup();
     }
 
-    public synchronized void enableAccount(String username, String password) {
+    public synchronized void addAccount(String username, String password) {
         logger.info("Enable account...");
 
         Account account = Account.getInstance(this, username, password);
         account.start();
-        synchronization(account);
+        synch(account);
 
-        if (account.getStatus()) {
+        if (account.isLive()) {
             accounts.add(account);
             logger.info("Account has been added.");
         } else {
@@ -54,13 +53,13 @@ public class Manager extends Thread {
         }
     }
 
-    public synchronized void disableAccount(Account account) {
+    public synchronized void delAccount(Account account) {
         logger.info("Disable account...");
 
         account.addTask(Account.Intention.DISABLE);
-        synchronization(account);
+        synch(account);
 
-        if (!account.getStatus()) {
+        if (!account.isLive()) {
             logger.info("Account has been disabled.");
             accounts.remove(account);
         } else {
@@ -73,7 +72,7 @@ public class Manager extends Thread {
 
         for (Account account : this.accounts) {
             AccountInfo accountInfo = getAccountInfo(account);
-            Wave.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
+            Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
         }
 
         logger.info("Done.");
@@ -83,7 +82,7 @@ public class Manager extends Thread {
         logger.info("Get account info...");
 
         account.addTask(Account.Intention.GET_INFO);
-        synchronization(account);
+        synch(account);
 
         AccountInfo accountInfo = account.getInfo();
         logger.info("Account info: " + accountInfo);
@@ -91,25 +90,22 @@ public class Manager extends Thread {
         return accountInfo;
     }
 
-    // *** Intents. ***
     public synchronized void getJob(Account account) {
         logger.info("Signal to employ.");
         account.addTask(Account.Intention.EMPLOY);
     }
 
-    // Waiting for a response from another (account) thread about the completion of the process.
-    private void synchronization(Account account) {
+    // Waits for a response from another (account) thread about the completion of the process.
+    private void synch(Account account) {
         logger.info("Synchronization...");
 
-        while (!account.getCompletionStatus()) {
+        while (!account.isCompletion()) {
             try {
-                Thread.sleep(2333);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        account.changeCompletionStatus();
 
         logger.info("Done.");
     }
@@ -124,7 +120,7 @@ public class Manager extends Thread {
         return null;
     }
 
-    public int getActiveAccounts() {
+    public int getActiveAccountsCount() {
         return this.accounts.size();
     }
 

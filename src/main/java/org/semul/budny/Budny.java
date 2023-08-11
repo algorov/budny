@@ -10,6 +10,7 @@ public class Budny {
 
     public Budny() {
         this.manager = Manager.getInstance();
+        this.manager.start();
     }
 
     public static void main(String[] args) {
@@ -18,7 +19,7 @@ public class Budny {
         Budny app = new Budny();
         app.signIn(args[0], args[1]);
 
-        while (app.manager.getActiveAccounts() > 0 && ExeptionCount.count <= 5) {
+        while (app.manager.getActiveAccountsCount() > 0 && ExeptionCount.count <= 5) {
         }
 
         app.manager.halt();
@@ -26,11 +27,11 @@ public class Budny {
 
     public void signIn(String username, String password) {
         logger.info("Sign in account.");
-        manager.enableAccount(username, password);
+        manager.addAccount(username, password);
     }
 
     public void signOut(int accountId) {
         logger.info("Sign out account.");
-        this.manager.disableAccount(this.manager.getAccount(accountId));
+        this.manager.delAccount(this.manager.getAccount(accountId));
     }
 }
