@@ -18,7 +18,7 @@ public class Manager extends Thread {
         logger.info("Initialization...");
         this.accounts = new ArrayList<>();
         this.status = true;
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     @Override
@@ -47,9 +47,9 @@ public class Manager extends Thread {
 
         if (account.isLive()) {
             accounts.add(account);
-            logger.info("Account has been added.");
+            logger.info("Account has been added");
         } else {
-            logger.info("Account hasn't been added.");
+            logger.info("Account hasn't been added");
         }
     }
 
@@ -60,10 +60,10 @@ public class Manager extends Thread {
         synch(account);
 
         if (!account.isLive()) {
-            logger.info("Account has been disabled.");
+            logger.info("Account has been disabled");
             accounts.remove(account);
         } else {
-            logger.info("Account hasn't been disabled.");
+            logger.info("Account hasn't been disabled");
         }
     }
 
@@ -75,7 +75,7 @@ public class Manager extends Thread {
             Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
         }
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     private AccountInfo getAccountInfo(Account account) {
@@ -91,7 +91,7 @@ public class Manager extends Thread {
     }
 
     public synchronized void getJob(Account account) {
-        logger.info("Signal to employ.");
+        logger.info("Signal to employ");
         account.addTask(Account.Intention.EMPLOY);
     }
 
@@ -107,11 +107,11 @@ public class Manager extends Thread {
             }
         }
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     public Account getAccount(int index) {
-        logger.info("Get account.");
+        logger.info("Get account");
 
         if (accounts.size() != 0) {
             return this.accounts.get(index);

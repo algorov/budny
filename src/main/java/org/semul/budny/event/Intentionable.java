@@ -21,6 +21,6 @@ public abstract class Intentionable {
         this.username = null;
         this.password = null;
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 }

@@ -18,7 +18,7 @@ public class Budny {
     }
 
     public static void main(String[] args) {
-        logger.info("Initialization.");
+        logger.info("Initialization");
 
         Budny app = new Budny();
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -43,12 +43,12 @@ public class Budny {
     }
 
     public void signIn(String username, String password) {
-        logger.info("Sign in account.");
+        logger.info("Sign in account");
         manager.addAccount(username, password);
     }
 
     public void signOut(int accountId) {
-        logger.info("Sign out account.");
+        logger.info("Sign out account");
         this.manager.delAccount(this.manager.getAccount(accountId));
     }
 }

@@ -15,32 +15,32 @@ public class EventController {
         this.connect = new Connection(driver, username, password);
         this.employ = new Employ(driver, username, password);
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     public void signIn() throws FailAuthorizationException {
-        logger.info("Sign in.");
-        this.connect.execute();
+        logger.info("Sign in");
+        this.connect.run();
     }
 
     public boolean checkConnection() {
-        logger.info("Check connection.");
-        return connect.status();
+        logger.info("Check connection");
+        return connect.getStatus();
     }
 
     public int getWorkEndCountdown() {
-        logger.info("Get employment countdown.");
-        return this.employ.getWorkEndCountdown();
+        logger.info("Get employment countdown");
+        return this.employ.detWorkEndCountdown();
     }
 
     public boolean checkWorkState() {
-        logger.info("Check work state.");
-        return this.employ.status();
+        logger.info("Check work state");
+        return this.employ.getStatus();
     }
 
     public void employ() throws FailEmployException {
-        logger.info("Employ.");
-        this.employ.execute();
+        logger.info("Employ");
+        this.employ.run();
     }
 
     public void interrupt() {
@@ -50,6 +50,6 @@ public class EventController {
 
         this.employ.cleanup();
         this.employ = null;
-        logger.info("Done.");
+        logger.info("Done");
     }
 }

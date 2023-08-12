@@ -17,21 +17,21 @@ public class Connection extends Intentionable {
         logger.info("Initialization.");
     }
 
-    public void execute() throws FailAuthorizationException {
+    public void run() throws FailAuthorizationException {
         logger.info("Execute.");
         signIn();
 
-        boolean connectionStatus = status();
-        logger.info("Connection status: " + connectionStatus + ".");
+        boolean connectionStatus = getStatus();
+        logger.info("Connection status: " + connectionStatus);
 
         if (!connectionStatus) {
-            String captchaUrl = getCaptchaUrl();
-            logger.info("Captcha URL: " + captchaUrl + ".");
+            String captchaUrl = detCaptchaUrl();
+            logger.info("Captcha URL: " + captchaUrl);
 
             if (captchaUrl != null) {
                 this.signIn(captchaUrl);
 
-                if (!status()) {
+                if (!getStatus()) {
                     String message = "Not valid data or captcha!";
                     logger.warn(message);
                     throw new FailAuthorizationException(message);
@@ -44,20 +44,20 @@ public class Connection extends Intentionable {
         }
     }
 
-    public boolean status() {
+    public boolean getStatus() {
         logger.info("Def status...");
 
         this.driver.get(Paths.URL);
         boolean status = !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
                 (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
 
-        logger.info("Status: " + status + ".");
+        logger.info("Status: " + status);
 
         return status;
     }
 
     private void signIn() {
-        logger.info("Sign in.");
+        logger.info("Sign in");
         this.driver.get(Paths.URL);
 
         try {
@@ -87,9 +87,9 @@ public class Connection extends Intentionable {
             passwordField.sendKeys(password);
 
             String captchaPath = Captcha.save(captchaUrl);
-            logger.info("Captcha PATH: " + captchaPath + ".");
+            logger.info("Captcha PATH: " + captchaPath);
             String code = CaptchaSolution.solution(captchaPath);
-            logger.info("Captcha solution: " + code + ".");
+            logger.info("Captcha solution: " + code);
             Captcha.delete(captchaPath);
 
             if (code != null) {
@@ -105,8 +105,8 @@ public class Connection extends Intentionable {
         }
     }
 
-    private String getCaptchaUrl() {
-        logger.info("Get captcha URL.");
+    private String detCaptchaUrl() {
+        logger.info("Determines captcha URL");
 
         WebElement captchaField = null;
         try {

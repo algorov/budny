@@ -19,39 +19,39 @@ public class Employ extends Intentionable {
 
     Employ(ChromeDriver driver, String username, String password) {
         super(driver, username, password);
-        logger.info("Initialization.");
+        logger.info("Initialization");
     }
 
-    public void execute() throws FailEmployException {
-        logger.info("Execute.");
+    public void run() throws FailEmployException {
+        logger.info("Execute");
         this.driver.get(Paths.URL + Paths.PagePath.MAP.getValue());
 
         String vacancyUrl;
-        String sectorPath = defSector();
-        logger.info("Sector path: " + sectorPath + ".");
+        String sectorPath = detSector();
+        logger.info("Sector path: " + sectorPath);
 
         if (sectorPath != null) {
-            vacancyUrl = defJobPath(sectorPath);
+            vacancyUrl = detJobPath(sectorPath);
         } else {
             String message = "Sector not defined!";
             logger.warn(message);
             throw new FailEmployException(message);
         }
 
-        logger.info("Vacancy URL: " + vacancyUrl + ".");
+        logger.info("Vacancy URL: " + vacancyUrl);
 
         if (vacancyUrl != null) {
             driver.get(vacancyUrl);
 
             String quessCaptchaUrl = getCaptchaUrl();
-            logger.info("Quess captcha URL: " + quessCaptchaUrl + ".");
+            logger.info("Quess captcha URL: " + quessCaptchaUrl);
 
             if (quessCaptchaUrl != null) {
                 String localPath = Captcha.save(quessCaptchaUrl);
-                logger.info("Captcha local PATH: " + localPath + ".");
+                logger.info("Captcha local PATH: " + localPath);
 
                 String solution = CaptchaSolution.solution(localPath);
-                logger.info("Captcha colution: " + solution + ".");
+                logger.info("Captcha colution: " + solution);
                 Captcha.delete(localPath);
 
                 if (solution != null) {
@@ -74,8 +74,8 @@ public class Employ extends Intentionable {
                 throw new FailEmployException(message);
             }
 
-            boolean status = status();
-            logger.info("Employ status: " + status + ".");
+            boolean status = getStatus();
+            logger.info("Employ status: " + status);
 
             if (!status) {
                 String message = "Captcha solved incorrectly!";
@@ -89,8 +89,8 @@ public class Employ extends Intentionable {
         }
     }
 
-    public boolean status() {
-        logger.info("Get status.");
+    public boolean getStatus() {
+        logger.info("Get status");
 
         if ((Paths.URL + Paths.PagePath.OI.getValue()).equals(this.driver.getCurrentUrl().split("\\?")[0])) {
             WebElement employStatusField = null;
@@ -106,20 +106,18 @@ public class Employ extends Intentionable {
             }
         } else {
             this.driver.get(Paths.URL + Paths.PagePath.HOME.getValue());
-            int workEndCountdown = getWorkEndCountdown();
+            int workEndCountdown = detWorkEndCountdown();
 
-            logger.info("Work end countdown: " + workEndCountdown + " sec.");
+            logger.info("Work end countdown: " + workEndCountdown + " sec");
 
             return workEndCountdown != 0;
         }
     }
 
-    // Предзназначен для подсчета обратного времени, чтобы закончить работу. Если не удалось определить - то возвращает -1.
-    public int getWorkEndCountdown() {
-        logger.info("Get work end countdown.");
+    public int detWorkEndCountdown() {
+        logger.info("Determines work end countdown");
 
         int countdown = 0;
-
         try {
             this.driver.get(Paths.URL + Paths.PagePath.HOME.getValue());
 
@@ -146,14 +144,11 @@ public class Employ extends Intentionable {
             countdown = -1;
         }
 
-        System.out.println("Countdown = " + countdown);
-
         return countdown;
     }
 
-    // Возвращет сеткор или null.
-    private String defSector() {
-        logger.info("Def sector.");
+    private String detSector() {
+        logger.info("Determines sector");
 
         WebElement labelField = null;
         try {
@@ -165,9 +160,8 @@ public class Employ extends Intentionable {
         return labelField != null ? Paths.MAP_SECTOR.get(labelField.getText()) : null;
     }
 
-    // Возвращет path или null.
-    private String defJobPath(String sectorPath) {
-        logger.info("Def job PATH.");
+    private String detJobPath(String sectorPath) {
+        logger.info("Def job PATH");
 
         for (Paths.WorkType item : Paths.WorkType.values()) {
             String url = Paths.URL + Paths.PagePath.MAP.getValue() + "?" + sectorPath + "&st=" + item.getValue();
@@ -188,9 +182,8 @@ public class Employ extends Intentionable {
         return null;
     }
 
-    // Возвращет url или null.
     private String getCaptchaUrl() {
-        logger.info("Get captcha URL.");
+        logger.info("Get captcha URL");
 
         WebElement captchaField = null;
         try {

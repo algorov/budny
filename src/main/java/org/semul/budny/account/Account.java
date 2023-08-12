@@ -68,7 +68,7 @@ public class Account extends Thread {
             this.session.start();
             this.status = true;
 
-            logger.info("Successfully.");
+            logger.info("Successfully");
         } catch (StartSessionException e) {
             logger.error(e);
             disable();
@@ -89,13 +89,13 @@ public class Account extends Thread {
         this.status = false;
         this.completionStatus = true;
 
-        logger.info("Successfully.");
+        logger.info("Successfully");
     }
 
     public void addTask(Intention intent) {
-        logger.info("Adding a task '" + intent + "'...");
+        logger.info("Adding a task: " + intent);
         this.taskQueue.add(intent);
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     private void postRequest(Intention intent) {
@@ -113,12 +113,12 @@ public class Account extends Thread {
     }
 
     public boolean isLive() {
-        logger.info("Alive: " + this.status + ".");
+        logger.info("Alive: " + this.status);
         return this.status;
     }
 
     public AccountInfo getInfo() {
-        logger.info("Get info.");
+        logger.info("Get info");
         return this.info;
     }
 
@@ -127,17 +127,17 @@ public class Account extends Thread {
     }
 
     public String getUsername() {
-        logger.info("Get username.");
+        logger.info("Get username");
         return this.username;
     }
 
     public String getPassword() {
-        logger.info("Get password.");
+        logger.info("Get password");
         return this.password;
     }
 
     public boolean isCompletion() {
-        logger.info("Completion status: " + this.completionStatus + ".");
+        logger.info("Completion status: " + this.completionStatus);
 
         if (this.completionStatus) {
             this.completionStatus = false;

@@ -24,7 +24,7 @@ public class Session {
     }
 
     private Session(Account account, String username, String password) {
-        logger.info("Initialization.");
+        logger.info("Initialization");
 
         this.account = account;
         this.username = username;
@@ -32,7 +32,7 @@ public class Session {
         this.driver = null;
         this.exec = null;
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 
     private ChromeDriver initDriver() {
@@ -42,8 +42,7 @@ public class Session {
         System.setProperty("webdriver.chrome.driver", driverPath);
 
         ChromeOptions chromeOptions = new ChromeOptions();
-        String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
+        String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
         chromeOptions.addArguments("user-agent=" + userAgent);
         chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
         chromeOptions.addArguments("--remote-allow-origins=*");
@@ -78,7 +77,7 @@ public class Session {
 
         try {
             this.exec.signIn();
-            logger.info("Successfully.");
+            logger.info("Successfully");
         } catch (FailAuthorizationException e) {
             logger.error(e);
             throw new StartSessionException(e.getMessage());
@@ -101,30 +100,30 @@ public class Session {
 
         this.account = null;
 
-        logger.info("Done.");
+        logger.info("Done");
     }
-    
+
     // Reconnect to account. If it fails, pushes for an exception.
     private void restore() throws StartSessionException {
-        logger.info("Restore.");
+        logger.info("Restore");
         start();
     }
 
     // Account connection check.
     private boolean isConnect() {
-        logger.info("Check connect.");
+        logger.info("Check connect");
         boolean connect = false;
 
         if (this.exec != null) {
             connect = this.exec.checkConnection();
         }
 
-        logger.info("Connect status: " + connect + ".");
+        logger.info("Connect status: " + connect);
         return connect;
     }
 
     public void getAccountInfo() {
-        logger.info("Get account info.");
+        logger.info("Get account info");
         this.account.setInfo(new AccountInfo(this.exec.getWorkEndCountdown()));
     }
 
@@ -132,7 +131,7 @@ public class Session {
         if (isConnect()) {
             employAction();
         } else {
-            logger.warn("Connection broken.");
+            logger.warn("Connection broken");
             restore();
             employAction();
         }
@@ -140,13 +139,13 @@ public class Session {
     }
 
     private void employAction() throws FailEmployException {
-        logger.info("Employ.");
+        logger.info("Employ");
 
         if (!this.exec.checkWorkState()) {
-            logger.info("Necessary.");
+            logger.info("Necessary");
             this.exec.employ();
         } else {
-            logger.info("Not necessary.");
+            logger.info("Not necessary");
         }
     }
 }

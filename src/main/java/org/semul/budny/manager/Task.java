@@ -31,7 +31,7 @@ public class Task extends Thread {
     @Override
     public void run() {
         this.countdown = Countdown.getCorrectTime(this.countdown, 0.05F);
-        logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds.");
+        logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds");
         taskCount++;
 
         try {
@@ -53,12 +53,12 @@ public class Task extends Thread {
     }
 
     private void clear() {
-        logger.info("Interrupt wave...");
+        logger.info("Interrupt task...");
 
         this.manager = null;
         this.account = null;
         this.intent = null;
 
-        logger.info("Done.");
+        logger.info("Done");
     }
 }
