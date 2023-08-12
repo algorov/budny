@@ -3,11 +3,13 @@ package org.semul.budny.manager;
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
 import org.semul.budny.helper.Task;
+import org.semul.budny.helper.TasksController;
 
 import java.util.ArrayList;
 
 public class Manager extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
+    private TasksController tasksController;
     private ArrayList<Account> accounts;
     private volatile boolean status;
 
@@ -17,6 +19,7 @@ public class Manager extends Thread {
 
     private Manager() {
         logger.info("Initialization...");
+        this.tasksController = TasksController.getInstance();
         this.accounts = new ArrayList<>();
         this.status = true;
         logger.info("Done");
@@ -138,6 +141,8 @@ public class Manager extends Thread {
             }
         }
 
+        this.tasksController.halt();
+        this.tasksController = null;
         this.accounts = null;
     }
 

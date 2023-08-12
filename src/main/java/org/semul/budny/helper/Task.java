@@ -14,7 +14,10 @@ public class Task extends Thread {
     private int countdown;
 
     public static Task getInstance(Manager manager, Account account, Account.Intention intent, int countdown) {
-        return new Task(manager, account, intent, countdown);
+        Task task = new Task(manager, account, intent, countdown);
+        TasksController.tasks.add(task);
+
+        return task;
     }
 
     private Task(Manager manager, Account account, Account.Intention intent, int countdown) {
