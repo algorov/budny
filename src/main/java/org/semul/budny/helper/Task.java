@@ -1,7 +1,7 @@
-package org.semul.budny.manager;
+package org.semul.budny.helper;
 
 import org.semul.budny.account.Account;
-import org.semul.budny.helper.Countdown;
+import org.semul.budny.manager.Manager;
 
 import java.util.Objects;
 
