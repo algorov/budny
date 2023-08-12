@@ -46,7 +46,6 @@ public class Account extends Thread {
         launch();
 
         while (this.status) {
-            System.out.println(this.taskQueue.size());
             if (this.taskQueue.size() > 0) {
                 postRequest(this.taskQueue.poll());
             }
