@@ -90,6 +90,7 @@ public class Session {
 
         if (this.driver != null) {
             this.driver.close();
+            this.driver.quit();
             this.driver = null;
         }
 
