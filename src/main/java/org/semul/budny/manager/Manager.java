@@ -29,7 +29,7 @@ public class Manager extends Thread {
             }
 
             try {
-                Thread.sleep(5000);
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -71,8 +71,10 @@ public class Manager extends Thread {
         logger.info("Planning...");
 
         for (Account account : this.accounts) {
-            AccountInfo accountInfo = getAccountInfo(account);
-            Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
+            if (account.isCompletion(true)) {
+                AccountInfo accountInfo = getAccountInfo(account);
+                Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
+            }
         }
 
         logger.info("Done");
@@ -99,7 +101,7 @@ public class Manager extends Thread {
     private void synch(Account account) {
         logger.info("Synchronization...");
 
-        while (!account.isCompletion()) {
+        while (!account.isCompletion(false)) {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {

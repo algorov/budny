@@ -136,11 +136,14 @@ public class Account extends Thread {
         return this.password;
     }
 
-    public boolean isCompletion() {
+    public boolean isCompletion(boolean autochange) {
         logger.info("Completion status: " + this.completionStatus);
 
         if (this.completionStatus) {
-            this.completionStatus = false;
+            if (autochange) {
+                this.completionStatus = false;
+            }
+
             return true;
         } else return false;
     }
