@@ -11,7 +11,6 @@ public class Manager extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
     private TasksController tasksController;
     private ArrayList<Account> accounts;
-    private volatile boolean status;
 
     public static Manager getInstance() {
         return new Manager();
@@ -21,25 +20,22 @@ public class Manager extends Thread {
         logger.info("Initialization...");
         this.tasksController = TasksController.getInstance();
         this.accounts = new ArrayList<>();
-        this.status = true;
         logger.info("Done");
     }
 
     @Override
     public void run() {
-        while (this.status) {
-            if (Task.taskCount == 0) {
-                planning();
-            }
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (Task.taskCount == 0) {
+                    planning();
+                }
 
-            try {
                 Thread.sleep(15000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
+        } catch (InterruptedException e) {
+            cleanup();
         }
-
-        cleanup();
     }
 
     public synchronized void addAccount(String username, String password) {
@@ -110,7 +106,7 @@ public class Manager extends Thread {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                cleanup();
             }
         }
 
@@ -132,7 +128,7 @@ public class Manager extends Thread {
     }
 
     public void halt() {
-        this.status = false;
+        this.interrupt();
     }
 
     private void cleanup() {
@@ -145,6 +141,8 @@ public class Manager extends Thread {
         this.tasksController.halt();
         this.tasksController = null;
         this.accounts = null;
+
+        Thread.currentThread().interrupt();
     }
 
     @Override
