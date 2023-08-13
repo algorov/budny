@@ -15,6 +15,7 @@ public class Account extends Thread {
     private final String password;
     private volatile AccountInfo info;
     private volatile boolean status;
+    private volatile boolean blockPlanning;
     private volatile boolean completionStatus;
     private Session session;
     private final Queue<Intention> taskQueue;
@@ -35,6 +36,7 @@ public class Account extends Thread {
         this.password = password;
         this.status = false;
         this.taskQueue = new LinkedList<>();
+        setBlockPlanningStatus(false);
         this.completionStatus = false;
         this.session = null;
 
@@ -94,11 +96,16 @@ public class Account extends Thread {
     public void addTask(Intention intent) {
         logger.info("Adding a task: " + intent);
         this.taskQueue.add(intent);
+
+        if (intent == Intention.GET_INFO) {
+            setBlockPlanningStatus(true);
+        }
         logger.info("Done");
     }
 
     private void postRequest(Intention intent) {
         logger.info("POST: " + intent);
+
         try {
             this.session.getRequest(intent);
         } catch (FailEmployException employEx) {
@@ -109,6 +116,10 @@ public class Account extends Thread {
         }
 
         this.completionStatus = true;
+
+        if (intent != Intention.GET_INFO) {
+            setBlockPlanningStatus(false);
+        }
     }
 
     public boolean isLive() {
@@ -135,14 +146,23 @@ public class Account extends Thread {
         return this.password;
     }
 
-    public boolean isCompletion(boolean autochange) {
+    public void setBlockPlanningStatus(boolean status) {
+        this.blockPlanning = status;
+    }
+
+    public boolean getBlockPlanningStatus() {
+        return this.blockPlanning;
+    }
+
+    /**
+     * Статус звершения задачи.
+     * Если при чтении <b>completionStatus == true</b>, то происходит изменение состояния.
+     */
+    public boolean isCompletion() {
         logger.info("Completion status: " + this.completionStatus);
 
         if (this.completionStatus) {
-            if (autochange) {
-                this.completionStatus = false;
-            }
-
+            this.completionStatus = false;
             return true;
         } else return false;
     }

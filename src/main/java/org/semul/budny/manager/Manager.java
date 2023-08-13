@@ -75,7 +75,7 @@ public class Manager extends Thread {
         logger.info("Planning...");
 
         for (Account account : this.accounts) {
-            if (account.isCompletion(true)) {
+            if (!account.getBlockPlanningStatus()) {
                 AccountInfo accountInfo = getAccountInfo(account);
                 Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
             }
@@ -99,13 +99,14 @@ public class Manager extends Thread {
     public synchronized void getJob(Account account) {
         logger.info("Signal to employ");
         account.addTask(Account.Intention.EMPLOY);
+        synch(account);
     }
 
     // Waits for a response from another (account) thread about the completion of the process.
     private void synch(Account account) {
         logger.info("Synchronization...");
 
-        while (!account.isCompletion(false)) {
+        while (!account.isCompletion()) {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
