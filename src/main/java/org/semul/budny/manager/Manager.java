@@ -2,6 +2,7 @@ package org.semul.budny.manager;
 
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
+import org.semul.budny.event.Intention;
 import org.semul.budny.helper.Controller;
 import org.semul.budny.helper.Task;
 import org.semul.budny.helper.TasksController;
@@ -46,7 +47,7 @@ public class Manager extends Thread {
     public synchronized void addAccount(String username, String password) {
         logger.info("Enable account...");
 
-        Account account = Account.getInstance(this, username, password);
+        Account account = Account.getInstance(username, password);
         account.start();
         synch(account);
         if (account.isLive()) {
@@ -60,7 +61,7 @@ public class Manager extends Thread {
     public synchronized void delAccount(Account account) {
         logger.info("Disable account...");
 
-        account.addTask(Account.Intention.DISABLE);
+        account.addTask(Intention.DISABLE);
         synch(account);
 
         if (!account.isLive()) {
@@ -77,7 +78,7 @@ public class Manager extends Thread {
         for (Account account : this.accounts) {
             if (!account.getBlockPlanningStatus()) {
                 AccountInfo accountInfo = getAccountInfo(account);
-                Task.getInstance(this, account, Account.Intention.EMPLOY, accountInfo.workEndCountdown()).start();
+                Task.getInstance(this, account, Intention.EMPLOY, accountInfo.workEndCountdown()).start();
             }
         }
 
@@ -87,7 +88,7 @@ public class Manager extends Thread {
     private AccountInfo getAccountInfo(Account account) {
         logger.info("Get account info...");
 
-        account.addTask(Account.Intention.GET_INFO);
+        account.addTask(Intention.GET_INFO);
         synch(account);
 
         AccountInfo accountInfo = account.getInfo();
@@ -98,7 +99,7 @@ public class Manager extends Thread {
 
     public synchronized void getJob(Account account) {
         logger.info("Signal to employ");
-        account.addTask(Account.Intention.EMPLOY);
+        account.addTask(Intention.EMPLOY);
         synch(account);
     }
 

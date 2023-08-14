@@ -1,48 +1,40 @@
 package org.semul.budny.account;
 
 import org.semul.budny.connection.Session;
+import org.semul.budny.event.EventDriver;
+import org.semul.budny.event.Intention;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
 import org.semul.budny.helper.ThreadsController;
-import org.semul.budny.manager.Manager;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Account extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Account.class);
-    private Manager manager;
     private final String username;
     private final String password;
     private volatile AccountInfo info;
-    private volatile boolean blockPlanning;
-    private volatile boolean completionStatus;
     private Session session;
     private final Queue<Intention> taskQueue;
+    private volatile boolean blockPlanning;
+    private volatile boolean completionStatus;
 
-    public enum Intention {
-        DISABLE, GET_INFO, EMPLOY
-    }
-
-    public static synchronized Account getInstance(Manager manager, String username, String password) {
-        Account account = new Account(manager, username, password);
+    public static synchronized Account getInstance(String username, String password) {
+        Account account = new Account(username, password);
         ThreadsController.threads.add(account);
-
         return account;
     }
 
-    private Account(Manager manager, String username, String password) {
-        logger.info("Initialization...");
+    private Account(String username, String password) {
+        logger.info("Initialization.");
 
-        this.manager = manager;
         this.username = username;
         this.password = password;
+        this.session = Session.getInstance(this, new EventDriver(EventDriver.getDriver(), username, password));
         this.taskQueue = new LinkedList<>();
-        setBlockPlanningStatus(false);
+        this.blockPlanning = false;
         this.completionStatus = false;
-        this.session = null;
-
-        logger.info("Done.");
     }
 
     @Override
@@ -52,80 +44,47 @@ public class Account extends Thread {
 
             while (!Thread.currentThread().isInterrupted()) {
                 if (this.taskQueue.size() > 0) {
-                    postRequest(this.taskQueue.poll());
+                    runIntent(this.taskQueue.poll());
                 }
 
-                Thread.sleep(5000);
+                Thread.sleep(2000);
             }
-        } catch (InterruptedException ignored) {
-            disable();
+        } catch (InterruptedException ignoredOne) {
+            try {
+                quit(false);
+            } catch (InterruptedException ignoredTwo) {
+                Thread.currentThread().interrupt();
+            }
         }
-
     }
 
     private void launch() throws InterruptedException {
-        logger.info("Launch...");
-
-        this.session = Session.getInstance(this, this.username, this.password);
+        logger.info("Launch");
 
         try {
             this.session.start();
             this.completionStatus = true;
-            logger.info("Successfully");
         } catch (StartSessionException e) {
             logger.error(e);
-            System.out.println("Чтоооооо");
             throw new InterruptedException();
         }
     }
 
-    private void disable() {
-        logger.info("Disable...");
+    // Если это действие от намерения менеджера то true если же при неудачном входе в аккаунт false (для синхронизации)
+    private void quit(boolean flag) throws InterruptedException {
+        logger.info("Disable");
 
-        quitSession();
-
-        this.manager = null;
-        this.completionStatus = true;
-
-        logger.info("Successfully");
-
-        Thread.currentThread().interrupt();
-    }
-
-    private void quitSession() {
         if (this.session != null) {
             this.session.close();
             this.session = null;
         }
-    }
 
-    public void addTask(Intention intent) {
-        logger.info("Adding a task: " + intent);
-        this.taskQueue.add(intent);
-
-        if (intent == Intention.GET_INFO) {
-            setBlockPlanningStatus(true);
-        }
-        logger.info("Done");
-    }
-
-    private void postRequest(Intention intent) {
-        logger.info("POST: " + intent);
-
-        try {
-            this.session.getRequest(intent);
-        } catch (FailEmployException employEx) {
-            logger.warn(employEx);
-        } catch (StartSessionException sessionEx) {
-            logger.error(sessionEx);
-            this.manager.delAccount(this);
+        if (flag) {
+            throw new InterruptedException();
         }
 
         this.completionStatus = true;
-
-        if (intent != Intention.GET_INFO) {
-            setBlockPlanningStatus(false);
-        }
+        Thread.currentThread().interrupt();
     }
 
     public boolean isLive() {
@@ -134,27 +93,43 @@ public class Account extends Thread {
         return status;
     }
 
+    public void addTask(Intention intent) {
+        logger.info("Add a task: " + intent);
+        this.taskQueue.add(intent);
+        setBlockPlanningStatus(intent);
+    }
+
+    private void runIntent(Intention intent) throws InterruptedException {
+        logger.info("POST: " + intent);
+
+        try {
+            switch (intent) {
+                case GET_INFO -> session.getAccountInfo();
+                case EMPLOY -> session.getEmploy();
+                case DISABLE -> quit(true);
+            }
+        } catch (FailEmployException employEx) {
+            logger.warn(employEx);
+        } catch (StartSessionException sessionEx) {
+            logger.error(sessionEx);
+        } finally {
+            setBlockPlanningStatus(intent);
+            this.completionStatus = true;
+        }
+    }
+
+    public void setInfo(AccountInfo info) {
+        logger.info("Set info");
+        this.info = info;
+    }
+
     public AccountInfo getInfo() {
         logger.info("Get info");
         return this.info;
     }
 
-    public void setInfo(AccountInfo info) {
-        this.info = info;
-    }
-
-    public String getUsername() {
-        logger.info("Get username");
-        return this.username;
-    }
-
-    public String getPassword() {
-        logger.info("Get password");
-        return this.password;
-    }
-
-    public void setBlockPlanningStatus(boolean status) {
-        this.blockPlanning = status;
+    private void setBlockPlanningStatus(Intention intent) {
+        this.blockPlanning = Intention.GET_INFO == intent;
     }
 
     public boolean getBlockPlanningStatus() {
@@ -166,8 +141,6 @@ public class Account extends Thread {
      * Если при чтении <b>completionStatus == true</b>, то происходит изменение состояния.
      */
     public boolean isCompletion() {
-        logger.info("Completion status: " + this.completionStatus);
-
         if (this.completionStatus) {
             this.completionStatus = false;
             return true;
@@ -176,10 +149,9 @@ public class Account extends Thread {
 
     @Override
     public String toString() {
-        logger.info("toString.");
         return "\n● Account:\n" +
                 "▬▬ username: " + this.username + ";\n" +
                 "▬▬ password: " + this.password + ";\n" +
-                "▬▬ status: " + (!this.isInterrupted() ? "launched" : "stopped") + ";\n";
+                "▬▬ status: " + (!this.isInterrupted() ? "started" : "stopped") + ";\n";
     }
 }

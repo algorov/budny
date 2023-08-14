@@ -1,6 +1,7 @@
 package org.semul.budny.helper;
 
 import org.semul.budny.account.Account;
+import org.semul.budny.event.Intention;
 import org.semul.budny.manager.Manager;
 
 import java.util.Objects;
@@ -10,17 +11,17 @@ public class Task extends Thread {
     public static volatile int taskCount = 0;
     private Manager manager;
     private Account account;
-    private Account.Intention intent;
+    private Intention intent;
     private int countdown;
 
-    public static Task getInstance(Manager manager, Account account, Account.Intention intent, int countdown) {
+    public static Task getInstance(Manager manager, Account account, Intention intent, int countdown) {
         Task task = new Task(manager, account, intent, countdown);
         TasksController.tasks.add(task);
 
         return task;
     }
 
-    private Task(Manager manager, Account account, Account.Intention intent, int countdown) {
+    private Task(Manager manager, Account account, Intention intent, int countdown) {
         logger.info("Initialization...");
 
         this.manager = manager;
@@ -43,7 +44,7 @@ public class Task extends Thread {
             if (account.isLive()) {
                 logger.info("Signal to the manager about '" + intent + '.');
 
-                if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
+                if (Objects.requireNonNull(intent) == Intention.EMPLOY) {
                     manager.getJob(account);
                 }
             }

@@ -12,9 +12,8 @@ public class Session {
     private Account account;
     private EventDriver exec;
 
-    public static Session getInstance(Account account, String username, String password) {
-        EventDriver eventDriver = new EventDriver(EventDriver.getDriver(), username, password);
-        return new Session(account, eventDriver);
+    public static synchronized Session getInstance(Account account, EventDriver driver) {
+        return new Session(account, driver);
     }
 
     private Session(Account account, EventDriver eventDriver) {
@@ -56,14 +55,6 @@ public class Session {
         boolean connect = this.exec.checkConnection();
         logger.info("Connect status: " + connect);
         return connect;
-    }
-
-    public void getRequest(Account.Intention intent) throws StartSessionException, FailEmployException {
-        switch (intent) {
-            case GET_INFO -> getAccountInfo();
-            case EMPLOY -> getEmploy();
-            case DISABLE -> close();
-        }
     }
 
     /**
