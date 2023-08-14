@@ -82,10 +82,7 @@ public class Account extends Thread {
     private void disable() {
         logger.info("Disable...");
 
-        if (this.session != null) {
-            this.session.interrupt();
-            this.session = null;
-        }
+        quitSession();
 
         this.manager = null;
         this.completionStatus = true;
@@ -93,6 +90,13 @@ public class Account extends Thread {
         logger.info("Successfully");
 
         Thread.currentThread().interrupt();
+    }
+
+    private void quitSession() {
+        if (this.session != null) {
+            this.session.close();
+            this.session = null;
+        }
     }
 
     public void addTask(Intention intent) {
