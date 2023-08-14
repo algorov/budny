@@ -70,9 +70,11 @@ public class Account extends Thread {
 
         try {
             this.session.start();
+            this.completionStatus = true;
             logger.info("Successfully");
         } catch (StartSessionException e) {
             logger.error(e);
+            System.out.println("Чтоооооо");
             throw new InterruptedException();
         }
     }

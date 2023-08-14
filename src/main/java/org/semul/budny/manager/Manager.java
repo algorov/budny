@@ -49,7 +49,6 @@ public class Manager extends Thread {
         Account account = Account.getInstance(this, username, password);
         account.start();
         synch(account);
-
         if (account.isLive()) {
             accounts.add(account);
             logger.info("Account has been added");
