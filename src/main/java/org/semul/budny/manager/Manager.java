@@ -2,44 +2,45 @@ package org.semul.budny.manager;
 
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
+import org.semul.budny.helper.Controller;
 import org.semul.budny.helper.Task;
 import org.semul.budny.helper.TasksController;
+import org.semul.budny.helper.ThreadsController;
 
 import java.util.ArrayList;
 
 public class Manager extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
-    private TasksController tasksController;
+    private Controller tasksController;
     private ArrayList<Account> accounts;
-    private volatile boolean status;
 
     public static Manager getInstance() {
-        return new Manager();
+        Manager manager = new Manager();
+        ThreadsController.threads.add(manager);
+
+        return manager;
     }
 
     private Manager() {
         logger.info("Initialization...");
         this.tasksController = TasksController.getInstance();
         this.accounts = new ArrayList<>();
-        this.status = true;
         logger.info("Done");
     }
 
     @Override
     public void run() {
-        while (this.status) {
-            if (Task.taskCount == 0) {
-                planning();
-            }
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (Task.taskCount == 0) {
+                    planning();
+                }
 
-            try {
                 Thread.sleep(15000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
+        } catch (InterruptedException e) {
+            cleanup();
         }
-
-        cleanup();
     }
 
     public synchronized void addAccount(String username, String password) {
@@ -110,7 +111,7 @@ public class Manager extends Thread {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                cleanup();
             }
         }
 
@@ -132,11 +133,11 @@ public class Manager extends Thread {
     }
 
     public void halt() {
-        this.status = false;
+        this.interrupt();
     }
 
     private void cleanup() {
-        if (this.accounts.size() > 0) {
+        if (this.accounts.size() != 0) {
             for (Account account : accounts) {
                 account.interrupt();
             }
@@ -145,6 +146,8 @@ public class Manager extends Thread {
         this.tasksController.halt();
         this.tasksController = null;
         this.accounts = null;
+
+        Thread.currentThread().interrupt();
     }
 
     @Override

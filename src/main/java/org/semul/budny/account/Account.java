@@ -3,6 +3,7 @@ package org.semul.budny.account;
 import org.semul.budny.connection.Session;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
+import org.semul.budny.helper.ThreadsController;
 import org.semul.budny.manager.Manager;
 
 import java.util.LinkedList;
@@ -14,7 +15,6 @@ public class Account extends Thread {
     private final String username;
     private final String password;
     private volatile AccountInfo info;
-    private volatile boolean status;
     private volatile boolean blockPlanning;
     private volatile boolean completionStatus;
     private Session session;
@@ -25,7 +25,10 @@ public class Account extends Thread {
     }
 
     public static synchronized Account getInstance(Manager manager, String username, String password) {
-        return new Account(manager, username, password);
+        Account account = new Account(manager, username, password);
+        ThreadsController.threads.add(account);
+
+        return account;
     }
 
     private Account(Manager manager, String username, String password) {
@@ -34,7 +37,6 @@ public class Account extends Thread {
         this.manager = manager;
         this.username = username;
         this.password = password;
-        this.status = false;
         this.taskQueue = new LinkedList<>();
         setBlockPlanningStatus(false);
         this.completionStatus = false;
@@ -45,36 +47,33 @@ public class Account extends Thread {
 
     @Override
     public void run() {
-        launch();
+        try {
+            launch();
 
-        while (this.status) {
-            if (this.taskQueue.size() > 0) {
-                postRequest(this.taskQueue.poll());
-            }
+            while (!Thread.currentThread().isInterrupted()) {
+                if (this.taskQueue.size() > 0) {
+                    postRequest(this.taskQueue.poll());
+                }
 
-            try {
                 Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
+        } catch (InterruptedException ignored) {
+            disable();
         }
+
     }
 
-    private void launch() {
+    private void launch() throws InterruptedException {
         logger.info("Launch...");
 
         this.session = Session.getInstance(this, this.username, this.password);
 
         try {
             this.session.start();
-            this.status = true;
-
             logger.info("Successfully");
         } catch (StartSessionException e) {
             logger.error(e);
-            disable();
-        } finally {
-            this.completionStatus = true;
+            throw new InterruptedException();
         }
     }
 
@@ -87,10 +86,11 @@ public class Account extends Thread {
         }
 
         this.manager = null;
-        this.status = false;
         this.completionStatus = true;
 
         logger.info("Successfully");
+
+        Thread.currentThread().interrupt();
     }
 
     public void addTask(Intention intent) {
@@ -123,8 +123,9 @@ public class Account extends Thread {
     }
 
     public boolean isLive() {
-        logger.info("Alive: " + this.status);
-        return this.status;
+        boolean status = !this.isInterrupted();
+        logger.info("Alive: " + status);
+        return status;
     }
 
     public AccountInfo getInfo() {
@@ -173,6 +174,6 @@ public class Account extends Thread {
         return "\n● Account:\n" +
                 "▬▬ username: " + this.username + ";\n" +
                 "▬▬ password: " + this.password + ";\n" +
-                "▬▬ status: " + (this.status ? "launched" : "stopped") + ";\n";
+                "▬▬ status: " + (!this.isInterrupted() ? "launched" : "stopped") + ";\n";
     }
 }

@@ -33,26 +33,27 @@ public class Task extends Thread {
 
     @Override
     public void run() {
-        this.countdown = Countdown.getCorrectTime(this.countdown, 0.05F);
-        logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds");
-        taskCount++;
-
         try {
+            this.countdown = Countdown.getCorrectTime(this.countdown, 0.05F);
+            logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds");
+            taskCount++;
+
             Thread.sleep(this.countdown);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
-        if (account.isLive()) {
-            logger.info("Signal to the manager about '" + intent + '.');
+            if (account.isLive()) {
+                logger.info("Signal to the manager about '" + intent + '.');
 
-            if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
-                manager.getJob(account);
+                if (Objects.requireNonNull(intent) == Account.Intention.EMPLOY) {
+                    manager.getJob(account);
+                }
             }
-        }
 
-        taskCount--;
-        clear();
+            taskCount--;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            clear();
+        }
     }
 
     private void clear() {
