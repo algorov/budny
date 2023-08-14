@@ -3,13 +3,12 @@ package org.semul.budny.helper;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TasksController extends Thread implements Controller{
-    public static List<Task> tasks = new LinkedList<>();
+public class ThreadsController extends Thread implements Controller {
+    public static List<Thread> threads = new LinkedList<>();
 
     public static Controller getInstance() {
-        TasksController controller = new TasksController();
+        ThreadsController controller = new ThreadsController();
         controller.start();
-        ThreadsController.threads.add(controller);
 
         return controller;
     }
@@ -18,14 +17,14 @@ public class TasksController extends Thread implements Controller{
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                tasks.removeIf(task -> task.getState() == State.TERMINATED);
-                Thread.sleep(10000);
+                threads.removeIf(thread -> thread.getState() == State.TERMINATED);
+                Thread.sleep(500);
             }
         } catch (InterruptedException ignored) {
-            for (Task task : tasks) {
-                task.interrupt();
+            for (Thread thread : threads) {
+                thread.interrupt();
             }
-
+            System.out.println("Я тут");
             Thread.currentThread().interrupt();
         }
     }

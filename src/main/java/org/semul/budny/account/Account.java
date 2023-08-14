@@ -3,6 +3,7 @@ package org.semul.budny.account;
 import org.semul.budny.connection.Session;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
+import org.semul.budny.helper.ThreadsController;
 import org.semul.budny.manager.Manager;
 
 import java.util.LinkedList;
@@ -24,7 +25,10 @@ public class Account extends Thread {
     }
 
     public static synchronized Account getInstance(Manager manager, String username, String password) {
-        return new Account(manager, username, password);
+        Account account = new Account(manager, username, password);
+        ThreadsController.threads.add(account);
+
+        return account;
     }
 
     private Account(Manager manager, String username, String password) {

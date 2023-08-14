@@ -1,22 +1,29 @@
 package org.semul.budny.menu;
 
 import org.semul.budny.Budny;
+import org.semul.budny.helper.ThreadsController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Menu extends Thread{
+public class Menu extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Menu.class);
     private Budny app;
     private BufferedReader reader;
-    private boolean alive;
     private boolean flag;
+
+    public static Menu getInstance(Budny app) {
+        Menu menu = new Menu(app);
+        menu.start();
+        ThreadsController.threads.add(menu);
+
+        return menu;
+    }
 
     public Menu(Budny app) {
         this.app = app;
         this.reader = new BufferedReader(new InputStreamReader(System.in));
-        this.alive = true;
         this.flag = false;
     }
 
@@ -24,10 +31,9 @@ public class Menu extends Thread{
     public void run() {
         greetings();
 
-        while (alive) {
-            printMenu();
-
-            try {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                printMenu();
                 System.out.print(">>> ");
                 switch (reader.readLine()) {
                     case "1" -> {
@@ -35,18 +41,34 @@ public class Menu extends Thread{
                             addAccount();
                         }
                     }
-                    case "2" -> complete();
+                    case "2" -> quit();
                 }
+
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (InterruptedException ex) {
+            try {
+                this.reader.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            System.out.println(Thread.currentThread().getName() + " is interrupted!");
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            this.reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void greetings() {
+    private void greetings() {
         System.out.println("HI!");
     }
-    public void printMenu() {
+
+    private void printMenu() {
         System.out.println("Список команд:");
         if (!flag) {
             System.out.println("1 - начать");
@@ -55,7 +77,7 @@ public class Menu extends Thread{
         System.out.println("2 - выйти");
     }
 
-    public void addAccount() {
+    private void addAccount() {
         try {
             logger.info("Input data.");
             System.out.print("Enter the login >>> ");
@@ -72,9 +94,9 @@ public class Menu extends Thread{
         }
     }
 
-    private void complete() {
+    private void quit() throws InterruptedException {
         System.out.println("Bye");
         this.app.complete();
-        this.alive = false;
+        throw new InterruptedException();
     }
 }

@@ -2,18 +2,23 @@ package org.semul.budny.manager;
 
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
+import org.semul.budny.helper.Controller;
 import org.semul.budny.helper.Task;
 import org.semul.budny.helper.TasksController;
+import org.semul.budny.helper.ThreadsController;
 
 import java.util.ArrayList;
 
 public class Manager extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
-    private TasksController tasksController;
+    private Controller tasksController;
     private ArrayList<Account> accounts;
 
     public static Manager getInstance() {
-        return new Manager();
+        Manager manager = new Manager();
+        ThreadsController.threads.add(manager);
+
+        return manager;
     }
 
     private Manager() {
@@ -132,7 +137,7 @@ public class Manager extends Thread {
     }
 
     private void cleanup() {
-        if (this.accounts.size() > 0) {
+        if (this.accounts.size() != 0) {
             for (Account account : accounts) {
                 account.interrupt();
             }
