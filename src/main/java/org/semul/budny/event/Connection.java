@@ -47,7 +47,7 @@ public class Connection extends Intentionable {
     public boolean getStatus() {
         logger.info("Def status...");
 
-        this.driver.get(Paths.URL);
+        this.driver.navigate().refresh();
         boolean status = !((Paths.URL).equals(this.driver.getCurrentUrl()) ||
                 (Paths.URL + Paths.PagePath.LOGIN.getValue()).equals(this.driver.getCurrentUrl()));
 
@@ -94,6 +94,7 @@ public class Connection extends Intentionable {
 
             if (code != null) {
                 WebElement captchaCodeField = driver.findElement(new By.ByXPath(Paths.LoginPageElement.EFP01_CAPTCHA.getValue()));
+                captchaCodeField.click();
                 captchaCodeField.clear();
                 captchaCodeField.sendKeys(code);
             }
