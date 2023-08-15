@@ -4,6 +4,7 @@ import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
 import org.semul.budny.event.Intention;
 import org.semul.budny.helper.Task;
+import org.semul.budny.helper.TasksController;
 import org.semul.budny.helper.ThreadsController;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ public class Manager extends Thread {
     public static Manager getInstance() {
         Manager manager = new Manager();
         manager.start();
-        ThreadsController.threads.add(manager);
 
         return manager;
     }
@@ -27,17 +27,21 @@ public class Manager extends Thread {
 
     @Override
     public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                if (Task.taskCount == 0) {
-                    planning();
-                }
+        ThreadsController.pool.add(this);
 
-                Thread.sleep(15000);
+        while (!Thread.currentThread().isInterrupted()) {
+            if (TasksController.size() == 0) {
+                planning();
             }
-        } catch (InterruptedException e) {
-            cleanup();
+
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
+
+        quit();
     }
 
     /**
@@ -77,7 +81,7 @@ public class Manager extends Thread {
         for (Account account : this.accounts) {
             if (!account.getBlockPlanningStatus()) {
                 AccountInfo accountInfo = getAccountInfo(account);
-                Task.getInstance(this, account, Intention.EMPLOY, accountInfo.workEndCountdown());
+                Task.startThread(this, account, Intention.EMPLOY, accountInfo.workEndCountdown());
             }
         }
     }
@@ -102,17 +106,15 @@ public class Manager extends Thread {
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                cleanup();
+                Thread.currentThread().interrupt();
             }
         }
     }
 
-    private void cleanup() {
+    private void quit() {
         for (Account account : this.accounts) {
             account.interrupt();
         }
-
-        Thread.currentThread().interrupt();
     }
 
     @Override

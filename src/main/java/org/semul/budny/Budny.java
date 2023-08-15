@@ -15,35 +15,31 @@ public class Budny {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Budny.class);
     private volatile boolean isAlive;
     private final Manager manager;
-    private final Menu menu;
-    private final Controller threadsController;
-    private final Controller tasksController;
+    private final Controller<Thread> threadsController;
 
 
     public Budny() {
         this.isAlive = true;
         this.threadsController = ThreadsController.getInstance();
-        this.tasksController = TasksController.getInstance();
+        TasksController.startThread();
+        Menu.getInstance(this);
         this.manager = Manager.getInstance();
-        this.menu = Menu.getInstance(this);
     }
 
     public static void main(String[] args) {
         logger.info("Initialization");
-
         Budny app = new Budny();
 
         while (app.isAlive && ExeptionCount.count < 5) {
         }
 
-        app.threadsController.halt();
+        app.threadsController.close();
     }
 
     public void signIn(String username, String password) {
         logger.info("Sign in account");
         manager.addAccount(username, password);
     }
-
 
     public void complete() {
         this.isAlive = false;

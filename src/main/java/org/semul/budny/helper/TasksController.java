@@ -1,37 +1,47 @@
 package org.semul.budny.helper;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-public class TasksController extends Thread implements Controller{
-    public static List<Task> tasks = new LinkedList<>();
+public class TasksController extends Thread implements Controller<Task>{
+    public static List<Task> tasks = new ArrayList<>();
 
-    public static Controller getInstance() {
+    public static void startThread() {
         TasksController controller = new TasksController();
         controller.start();
-        ThreadsController.threads.add(controller);
+        ThreadsController.pool.add(controller);
+    }
 
-        return controller;
+    public static void add(Task task) {
+        tasks.add(task);
+    }
+
+    public static int size() {
+        return tasks.size();
     }
 
     @Override
     public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                tasks.removeIf(task -> task.getState() == State.TERMINATED);
-                Thread.sleep(10000);
+        while (!Thread.currentThread().isInterrupted()) {
+            tasks.removeIf(task -> task.getState() == State.TERMINATED);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException ignored) {
-            for (Task task : tasks) {
-                task.interrupt();
-            }
-
-            Thread.currentThread().interrupt();
         }
+
+        quit();
     }
 
     @Override
-    public void halt() {
+    public void close() {
         this.interrupt();
+    }
+
+    private void quit() {
+        for (Task task : tasks) {
+            task.interrupt();
+        }
     }
 }

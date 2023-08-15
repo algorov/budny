@@ -23,7 +23,7 @@ public class Account extends Thread {
     public static synchronized Account getInstance(String username, String password) {
         Account account = new Account(username, password);
         account.start();
-        ThreadsController.threads.add(account);
+        ThreadsController.pool.add(account);
         return account;
     }
 

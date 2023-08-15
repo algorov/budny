@@ -1,7 +1,7 @@
 package org.semul.budny.helper;
 
-public interface Controller {
-    public void halt();
-
+public interface Controller<T> {
     public void run();
+
+    public void close();
 }

@@ -1,10 +1,10 @@
 package org.semul.budny.helper;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadsController extends Thread implements Controller {
-    public static List<Thread> threads = new LinkedList<>();
+public class ThreadsController extends Thread implements Controller<Thread> {
+    public static List<Thread> pool = new ArrayList<>();
 
     public static Controller getInstance() {
         ThreadsController controller = new ThreadsController();
@@ -15,22 +15,30 @@ public class ThreadsController extends Thread implements Controller {
 
     @Override
     public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                threads.removeIf(thread -> thread.getState() == State.TERMINATED);
+        while (!Thread.currentThread().isInterrupted()) {
+            pool.removeIf(thread -> thread.getState() == State.TERMINATED);
+            try {
                 Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException ignored) {
-            for (Thread thread : threads) {
-                thread.interrupt();
-            }
-            System.out.println("Я тут");
-            Thread.currentThread().interrupt();
         }
+
+        quit();
     }
 
     @Override
-    public void halt() {
+    public void close() {
         this.interrupt();
+    }
+
+    public static void add(Thread thread) {
+        pool.add(thread);
+    }
+
+    private void quit() {
+        for (Thread thread : pool) {
+            thread.interrupt();
+        }
     }
 }

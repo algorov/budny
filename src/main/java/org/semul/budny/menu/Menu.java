@@ -16,7 +16,7 @@ public class Menu extends Thread {
     public static Menu getInstance(Budny app) {
         Menu menu = new Menu(app);
         menu.start();
-        ThreadsController.threads.add(menu);
+        ThreadsController.pool.add(menu);
 
         return menu;
     }
