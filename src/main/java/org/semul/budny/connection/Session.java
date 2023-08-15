@@ -10,7 +10,7 @@ import org.semul.budny.exception.StartSessionException;
 public class Session {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Session.class);
     private Account account;
-    private EventDriver exec;
+    private EventDriver driver;
 
     public static synchronized Session getInstance(Account account, EventDriver driver) {
         return new Session(account, driver);
@@ -20,7 +20,7 @@ public class Session {
         logger.info("Initialization");
 
         this.account = account;
-        this.exec = eventDriver;
+        this.driver = eventDriver;
     }
 
     // Connects to account. If it fails, pushes for an exception.
@@ -28,7 +28,7 @@ public class Session {
         logger.info("Start");
 
         try {
-            this.exec.signIn();
+            this.driver.signIn();
         } catch (FailAuthorizationException e) {
             logger.error(e);
             throw new StartSessionException(e.getMessage());
@@ -39,8 +39,8 @@ public class Session {
     public void close() {
         logger.info("Close");
 
-        this.exec.quit();
-        this.exec = null;
+        this.driver.quit();
+        this.driver = null;
         this.account = null;
     }
 
@@ -52,7 +52,7 @@ public class Session {
 
     // Account connection check.
     private boolean isConnect() {
-        boolean connect = this.exec.checkConnection();
+        boolean connect = this.driver.checkConnection();
         logger.info("Connect status: " + connect);
         return connect;
     }
@@ -62,7 +62,7 @@ public class Session {
      */
     public void getAccountInfo() {
         logger.info("Get account info");
-        this.account.setInfo(new AccountInfo(this.exec.getWorkEndCountdown()));
+        this.account.setInfo(new AccountInfo(this.driver.getWorkEndCountdown()));
     }
 
     public void getEmploy() throws FailEmployException, StartSessionException {
@@ -71,10 +71,10 @@ public class Session {
             restore();
         }
 
-        boolean needFlag = !this.exec.checkWorkState();
+        boolean needFlag = !this.driver.checkWorkState();
         logger.info(needFlag ? "Necessary" : "Not necessary");
         if (needFlag) {
-            this.exec.employ();
+            this.driver.employ();
         }
     }
 }

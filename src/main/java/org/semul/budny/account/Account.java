@@ -18,10 +18,11 @@ public class Account extends Thread {
     private Session session;
     private final Queue<Intention> taskQueue;
     private volatile boolean blockPlanning;
-    private volatile boolean completionStatus;
+    private volatile boolean complete;
 
     public static synchronized Account getInstance(String username, String password) {
         Account account = new Account(username, password);
+        account.start();
         ThreadsController.threads.add(account);
         return account;
     }
@@ -34,7 +35,7 @@ public class Account extends Thread {
         this.session = Session.getInstance(this, new EventDriver(EventDriver.getDriver(), username, password));
         this.taskQueue = new LinkedList<>();
         this.blockPlanning = false;
-        this.completionStatus = false;
+        this.complete = false;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class Account extends Thread {
 
         try {
             this.session.start();
-            this.completionStatus = true;
+            this.complete = true;
         } catch (StartSessionException e) {
             logger.error(e);
             throw new InterruptedException();
@@ -83,7 +84,7 @@ public class Account extends Thread {
             throw new InterruptedException();
         }
 
-        this.completionStatus = true;
+        this.complete = true;
         Thread.currentThread().interrupt();
     }
 
@@ -114,7 +115,7 @@ public class Account extends Thread {
             logger.error(sessionEx);
         } finally {
             setBlockPlanningStatus(intent);
-            this.completionStatus = true;
+            this.complete = true;
         }
     }
 
@@ -140,9 +141,9 @@ public class Account extends Thread {
      * Статус звершения задачи.
      * Если при чтении <b>completionStatus == true</b>, то происходит изменение состояния.
      */
-    public boolean isCompletion() {
-        if (this.completionStatus) {
-            this.completionStatus = false;
+    public boolean isComplete() {
+        if (this.complete) {
+            this.complete = false;
             return true;
         } else return false;
     }

@@ -3,6 +3,7 @@ package org.semul.budny;
 
 import org.semul.budny.exception.ExeptionCount;
 import org.semul.budny.helper.Controller;
+import org.semul.budny.helper.TasksController;
 import org.semul.budny.helper.ThreadsController;
 import org.semul.budny.manager.Manager;
 import org.semul.budny.menu.Menu;
@@ -15,15 +16,16 @@ public class Budny {
     private volatile boolean isAlive;
     private final Manager manager;
     private final Menu menu;
-    private final Controller controller;
+    private final Controller threadsController;
+    private final Controller tasksController;
 
 
     public Budny() {
         this.isAlive = true;
+        this.threadsController = ThreadsController.getInstance();
+        this.tasksController = TasksController.getInstance();
         this.manager = Manager.getInstance();
-        this.manager.start();
         this.menu = Menu.getInstance(this);
-        this.controller = ThreadsController.getInstance();
     }
 
     public static void main(String[] args) {
@@ -34,7 +36,7 @@ public class Budny {
         while (app.isAlive && ExeptionCount.count < 5) {
         }
 
-        app.controller.halt();
+        app.threadsController.halt();
     }
 
     public void signIn(String username, String password) {
@@ -42,10 +44,6 @@ public class Budny {
         manager.addAccount(username, password);
     }
 
-    public void signOut(int accountId) {
-        logger.info("Sign out account");
-        this.manager.delAccount(this.manager.getAccount(accountId));
-    }
 
     public void complete() {
         this.isAlive = false;

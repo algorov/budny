@@ -4,18 +4,17 @@ import org.semul.budny.account.Account;
 import org.semul.budny.event.Intention;
 import org.semul.budny.manager.Manager;
 
-import java.util.Objects;
-
 public class Task extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Task.class);
     public static volatile int taskCount = 0;
     private Manager manager;
     private Account account;
     private Intention intent;
-    private int countdown;
+    private int time;
 
     public static Task getInstance(Manager manager, Account account, Intention intent, int countdown) {
         Task task = new Task(manager, account, intent, countdown);
+        task.start();
         TasksController.tasks.add(task);
 
         return task;
@@ -27,24 +26,22 @@ public class Task extends Thread {
         this.manager = manager;
         this.account = account;
         this.intent = intent;
-        this.countdown = countdown;
-
-        logger.info("Done.");
+        this.time = countdown;
     }
 
     @Override
     public void run() {
         try {
-            this.countdown = Countdown.getCorrectTime(this.countdown, 0.05F);
-            logger.info("Signal to the manager about '" + intent + "' in " + this.countdown / 1000 + " seconds");
+            this.time = Countdown.getCorrectTime(this.time, 0.05F);
+            logger.info("[WAIT] " + intent + " after " + this.time / 1000 + " sec");
             taskCount++;
 
-            Thread.sleep(this.countdown);
+            Thread.sleep(this.time);
 
             if (account.isLive()) {
-                logger.info("Signal to the manager about '" + intent + '.');
+                logger.info("[RUN] " + intent);
 
-                if (Objects.requireNonNull(intent) == Intention.EMPLOY) {
+                if (intent == Intention.EMPLOY) {
                     manager.getJob(account);
                 }
             }
@@ -53,17 +50,15 @@ public class Task extends Thread {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            clear();
+            quit();
         }
     }
 
-    private void clear() {
-        logger.info("Interrupt task...");
+    private void quit() {
+        logger.info("Quit task");
 
         this.manager = null;
         this.account = null;
         this.intent = null;
-
-        logger.info("Done");
     }
 }
