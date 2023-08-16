@@ -9,16 +9,14 @@ import java.io.InputStreamReader;
 
 public class Menu extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Menu.class);
-    private Budny app;
-    private BufferedReader reader;
+    private final Budny app;
+    private final BufferedReader reader;
     private boolean flag;
 
-    public static Menu getInstance(Budny app) {
+    public static void getInstance(Budny app) {
         Menu menu = new Menu(app);
         menu.start();
         ThreadsController.pool.add(menu);
-
-        return menu;
     }
 
     public Menu(Budny app) {
@@ -34,16 +32,21 @@ public class Menu extends Thread {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 printMenu();
-                System.out.print(">>> ");
+
                 switch (reader.readLine()) {
                     case "1" -> {
                         if (!flag) {
                             addAccount();
+                        } else {
+                            quit();
                         }
                     }
-                    case "2" -> quit();
+                    case "2" -> {
+                        if (!flag) {
+                            quit();
+                        }
+                    }
                 }
-
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -53,7 +56,7 @@ public class Menu extends Thread {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println(Thread.currentThread().getName() + " is interrupted!");
+
             Thread.currentThread().interrupt();
         }
 
@@ -65,29 +68,37 @@ public class Menu extends Thread {
     }
 
     private void greetings() {
-        System.out.println("HI!");
+        System.out.println("▬▬▬▬▬▬ WELCOME! ▬▬▬▬▬▬");
     }
 
     private void printMenu() {
-        System.out.println("Список команд:");
+        System.out.println("\nCommand List:");
+        System.out.print("[1] ");
         if (!flag) {
-            System.out.println("1 - начать");
+            System.out.println("- sign in.");
+        } else {
+            System.out.println("- exit.");
         }
 
-        System.out.println("2 - выйти");
+        if (!flag) {
+            System.out.println("[2] - exit.");
+        }
+
+        System.out.print("\n[●] -> ");
     }
 
     private void addAccount() {
         try {
-            logger.info("Input data.");
-            System.out.print("Enter the login >>> ");
-            String login = this.reader.readLine();
-            System.out.print("Enter the password >>> ");
-            String password = this.reader.readLine();
-            this.app.signIn(login, password);
+            logger.info("Input data");
 
+            System.out.print("\n▬ Enter the login [●] -> ");
+            String login = this.reader.readLine();
+            System.out.print("▬ Enter the password [●] -> ");
+            String password = this.reader.readLine();
+            System.out.println();
+
+            this.app.signIn(login, password);
             this.flag = true;
-            System.out.println("Всё начнется или нет");
         } catch (IOException e) {
             logger.error(e);
             throw new RuntimeException(e);
@@ -95,7 +106,7 @@ public class Menu extends Thread {
     }
 
     private void quit() throws InterruptedException {
-        System.out.println("Bye");
+        logger.info("Exit");
         this.app.complete();
         throw new InterruptedException();
     }
