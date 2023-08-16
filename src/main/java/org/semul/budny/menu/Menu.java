@@ -1,7 +1,7 @@
 package org.semul.budny.menu;
 
 import org.semul.budny.Budny;
-import org.semul.budny.helper.ThreadsController;
+import org.semul.budny.controller.ThreadsController;
 
 import java.io.BufferedReader;
 import java.io.IOException;

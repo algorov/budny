@@ -1,7 +1,8 @@
 package org.semul.budny.helper;
 
 import org.semul.budny.account.Account;
-import org.semul.budny.event.Intention;
+import org.semul.budny.controller.TasksController;
+import org.semul.budny.action.Intention;
 import org.semul.budny.manager.Manager;
 
 public class Task extends Thread {

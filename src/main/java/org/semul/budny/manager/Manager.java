@@ -2,10 +2,10 @@ package org.semul.budny.manager;
 
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
-import org.semul.budny.event.Intention;
+import org.semul.budny.action.Intention;
 import org.semul.budny.helper.Task;
-import org.semul.budny.helper.TasksController;
-import org.semul.budny.helper.ThreadsController;
+import org.semul.budny.controller.TasksController;
+import org.semul.budny.controller.ThreadsController;
 
 import java.util.ArrayList;
 

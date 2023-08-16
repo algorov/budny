@@ -1,9 +1,11 @@
-package org.semul.budny.helper;
+package org.semul.budny.controller;
+
+import org.semul.budny.helper.Task;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TasksController extends Thread implements Controller<Task>{
+public class TasksController extends Thread implements Controller<Task> {
     public static List<Task> tasks = new ArrayList<>();
 
     public static void startThread() {

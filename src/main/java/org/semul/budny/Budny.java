@@ -1,15 +1,11 @@
 package org.semul.budny;
 
-
 import org.semul.budny.exception.ExeptionCount;
-import org.semul.budny.helper.Controller;
-import org.semul.budny.helper.TasksController;
-import org.semul.budny.helper.ThreadsController;
+import org.semul.budny.controller.Controller;
+import org.semul.budny.controller.TasksController;
+import org.semul.budny.controller.ThreadsController;
 import org.semul.budny.manager.Manager;
 import org.semul.budny.menu.Menu;
-
-
-
 
 public class Budny {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Budny.class);

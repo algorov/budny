@@ -11,14 +11,14 @@ public class EventDriver {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(EventDriver.class);
 
     private ChromeDriver driver;
-    private Connection connect;
+    private Connect connect;
     private Employ employ;
 
     public EventDriver(ChromeDriver driver, String username, String password) {
         logger.info("Initialization...");
 
         this.driver = driver;
-        this.connect = new Connection(driver, username, password);
+        this.connect = new Connect(driver, username, password);
         this.employ = new Employ(driver, username, password);
 
         logger.info("Done");
@@ -69,7 +69,7 @@ public class EventDriver {
 
     public boolean checkWorkState() {
         logger.info("Check work state");
-        return this.employ.getStatus();
+        return getWorkEndCountdown() != 0;
     }
 
     public void employ() throws FailEmployException {
@@ -81,8 +81,8 @@ public class EventDriver {
         logger.info("Quit");
 
         quitDriver();
-        this.connect.cleanup();
-        this.employ.cleanup();
+        this.connect.quit();
+        this.employ.quit();
         this.connect = null;
         this.employ = null;
     }

@@ -1,4 +1,4 @@
-package org.semul.budny.helper;
+package org.semul.budny.controller;
 
 import java.util.ArrayList;
 import java.util.List;

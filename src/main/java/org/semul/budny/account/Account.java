@@ -2,10 +2,10 @@ package org.semul.budny.account;
 
 import org.semul.budny.connection.Session;
 import org.semul.budny.event.EventDriver;
-import org.semul.budny.event.Intention;
+import org.semul.budny.action.Intention;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
-import org.semul.budny.helper.ThreadsController;
+import org.semul.budny.controller.ThreadsController;
 
 import java.util.LinkedList;
 import java.util.Queue;
