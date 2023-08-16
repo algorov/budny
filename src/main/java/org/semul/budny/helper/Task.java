@@ -23,7 +23,7 @@ public class Task extends Thread {
         this.manager = manager;
         this.account = account;
         this.intent = intent;
-        this.time = countdown;
+        this.time = countdown > 0 ? countdown + 60 : 0;
     }
 
     @Override
