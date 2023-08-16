@@ -112,13 +112,13 @@ public class Connect extends EventAbstract {
     private String detCaptchaUrl() {
         logger.info("Determines CAPTCHA URL");
 
-        WebElement captchaField = null;
         try {
-            captchaField = driver.findElement(new By.ByXPath(LoginPageElement.FP01_CAPTCHA.getValue()));
+            WebElement captchaField = driver.findElement(new By.ByXPath(LoginPageElement.FP01_CAPTCHA.getValue()));
+            return captchaField.getAttribute("src");
         } catch (NoSuchElementException e) {
             logger.warn(e);
         }
 
-        return captchaField != null ? captchaField.getAttribute("src") : null;
+        return null;
     }
 }
