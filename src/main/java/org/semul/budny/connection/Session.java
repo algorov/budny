@@ -71,10 +71,6 @@ public class Session {
             restore();
         }
 
-        boolean needFlag = !this.driver.checkWorkState();
-        logger.info(needFlag ? "Necessary" : "Not necessary");
-        if (needFlag) {
-            this.driver.employ();
-        }
+        this.driver.employ();
     }
 }
