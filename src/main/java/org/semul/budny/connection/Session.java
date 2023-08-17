@@ -23,7 +23,10 @@ public class Session {
         this.driver = eventDriver;
     }
 
-    // Connects to account. If it fails, pushes for an exception.
+    /**
+     * Connects to account. If it fails, pushes for an exception.
+     * @throws StartSessionException failed connection.
+     */
     public void start() throws StartSessionException {
         logger.info("Start");
 
@@ -35,7 +38,7 @@ public class Session {
         }
     }
 
-    // Disconnects account's connection.
+    // Closes account's connection.
     public void close() {
         logger.info("Close");
 
@@ -44,13 +47,16 @@ public class Session {
         this.account = null;
     }
 
-    // Reconnect to account. If it fails, pushes for an exception.
+    /**
+     * Reconnect to account. If it fails, pushes for an exception.
+     * @throws StartSessionException failed connection.
+     */
     private void restore() throws StartSessionException {
         logger.info("Restore");
         start();
     }
 
-    // Account connection check.
+    // Check session status.
     private boolean isConnect() {
         boolean connect = this.driver.checkConnection();
         logger.info("Connect status: " + connect);

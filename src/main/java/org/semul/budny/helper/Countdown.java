@@ -10,7 +10,8 @@ public class Countdown {
     }
 
     /**
-     * maxRandomDispersion - determines the maximum spread.
+     * @param maxRandomDispersion determines the maximum spread.
+     *
      * For example, with a value of 0.5, the maximum number of seconds can increase up to 50%
      * of the original value of seconds. Returns the time in milliseconds.
      **/

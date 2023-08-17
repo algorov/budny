@@ -1,11 +1,12 @@
 package org.semul.budny.account;
 
-import org.semul.budny.connection.Session;
-import org.semul.budny.event.EventDriver;
 import org.semul.budny.action.Intention;
+import org.semul.budny.connection.Session;
+import org.semul.budny.controller.ThreadsController;
+import org.semul.budny.event.EventDriver;
 import org.semul.budny.exception.FailEmployException;
 import org.semul.budny.exception.StartSessionException;
-import org.semul.budny.controller.ThreadsController;
+import org.semul.budny.manager.Manager;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -17,6 +18,14 @@ public class Account extends Thread {
     private volatile AccountInfo info;
     private Session session;
     private final Queue<Intention> taskQueue;
+
+    /**
+     * Needed to temporarily block the account so that {@code Manager} does not add duplicate tasks.
+     *
+     * <b>In the future, such a concept should be abandoned to a more pragmatic solution</b>.
+     *
+     * @see Manager#planning()
+     */
     private volatile boolean blockPlanning;
     private volatile boolean complete;
 
@@ -71,7 +80,11 @@ public class Account extends Thread {
         }
     }
 
-    // Если это действие от намерения менеджера то true если же при неудачном входе в аккаунт false (для синхронизации)
+    /**
+     * @param flag if the method calls {@link Manager}, then the value must be <b>true</b>, otherwise <b>false</b>.
+     * @see org.semul.budny.manager.Manager#delAccount(Account)
+     * @see Account#run()
+     */
     private void quit(boolean flag) throws InterruptedException {
         logger.info("Disable");
 
@@ -88,18 +101,29 @@ public class Account extends Thread {
         Thread.currentThread().interrupt();
     }
 
+    /**
+     * @return {@link Account} state.
+     */
     public boolean isLive() {
         boolean status = !this.isInterrupted();
         logger.info("Alive: " + status);
         return status;
     }
 
+    /**
+     * @param intent action to be performed.
+     * @see Intention
+     */
     public void addTask(Intention intent) {
         logger.info("Add a task: " + intent);
         this.taskQueue.add(intent);
         setBlockPlanningStatus(intent);
     }
 
+    /**
+     * @param intent action to be performed.
+     * @see Intention
+     */
     private void runIntent(Intention intent) throws InterruptedException {
         logger.info("POST: " + intent);
 
@@ -138,8 +162,10 @@ public class Account extends Thread {
     }
 
     /**
-     * Статус звершения задачи.
-     * Если при чтении <b>completionStatus == true</b>, то происходит изменение состояния.
+     * Task completion status. Used to synchronize with {@link Manager}.
+     * If reading <b>complete == true</b>, then a state change.
+     *
+     * @see org.semul.budny.manager.Manager#sync(Account)
      */
     public boolean isComplete() {
         if (this.complete) {
@@ -150,9 +176,6 @@ public class Account extends Thread {
 
     @Override
     public String toString() {
-        return "\n● Account:\n" +
-                "▬▬ username: " + this.username + ";\n" +
-                "▬▬ password: " + this.password + ";\n" +
-                "▬▬ status: " + (!this.isInterrupted() ? "started" : "stopped") + ";\n";
+        return "\n● Account:\n" + "▬▬ username: " + this.username + ";\n" + "▬▬ password: " + this.password + ";\n" + "▬▬ status: " + (!this.isInterrupted() ? "started" : "stopped") + ";\n";
     }
 }

@@ -3,9 +3,9 @@ package org.semul.budny.manager;
 import org.semul.budny.account.Account;
 import org.semul.budny.account.AccountInfo;
 import org.semul.budny.action.Intention;
-import org.semul.budny.helper.Task;
 import org.semul.budny.controller.TasksController;
 import org.semul.budny.controller.ThreadsController;
+import org.semul.budny.helper.Task;
 
 import java.util.ArrayList;
 
@@ -46,6 +46,13 @@ public class Manager extends Thread {
 
     /**
      * <h1>Intents</h1>
+     *
+     * <h3>Attention</h3>
+     * After sending a signal to an action, there should be synchronization!
+     *
+     * @see Manager#addAccount(String, String)
+     * @see Manager#delAccount(Account)
+     * @see Manager#getJob(Account)
      */
     public synchronized void addAccount(String username, String password) {
         logger.info("Enables account");
