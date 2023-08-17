@@ -13,6 +13,10 @@ public class ThreadsController extends Thread implements Controller<Thread> {
         return controller;
     }
 
+    public static void add(Thread thread) {
+        pool.add(thread);
+    }
+
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -30,10 +34,6 @@ public class ThreadsController extends Thread implements Controller<Thread> {
     @Override
     public void close() {
         this.interrupt();
-    }
-
-    public static void add(Thread thread) {
-        pool.add(thread);
     }
 
     private void quit() {

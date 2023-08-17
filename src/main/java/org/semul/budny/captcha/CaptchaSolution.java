@@ -8,7 +8,7 @@ public class CaptchaSolution {
     public static String API_KEY = "df1293f1a441c150294d5838fd0b1cb7";
 
     public static String solution(String captchaPath) {
-        logger.info("Captcha solution...");
+        logger.info("Captcha solution");
 
         TwoCaptcha twoCaptcha = new TwoCaptcha(API_KEY);
         twoCaptcha.setDefaultTimeout(60);
@@ -22,7 +22,7 @@ public class CaptchaSolution {
 
         try {
             twoCaptcha.solve(captcha);
-            logger.info("Captcha solved.");
+            logger.info("Captcha solved");
         } catch (Exception e) {
             logger.error(e);
         }

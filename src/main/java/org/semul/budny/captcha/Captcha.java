@@ -21,12 +21,10 @@ public class Captcha {
         if (!catalog.exists()) {
             catalog.mkdirs();
         }
-
-        logger.info("Done.");
     }
 
     public static String save(String imageUrl) {
-        logger.info("Download captcha...");
+        logger.info("Download captcha");
 
         catalogExistCheck();
 
@@ -48,8 +46,6 @@ public class Captcha {
                 fileOutputStream.flush();
             }
 
-            logger.info("Done!");
-
             return CATALOG_PATH + imageName + ".jpeg";
         } catch (MalformedURLException e) {
             logger.fatal(e);
@@ -58,7 +54,7 @@ public class Captcha {
             logger.fatal(e);
             throw new RuntimeException(e);
         } finally {
-            logger.info("Close streams...");
+            logger.info("Close streams");
 
             try {
                 inputStream.close();
@@ -74,19 +70,15 @@ public class Captcha {
                     throw new RuntimeException(e);
                 }
             }
-
-            logger.info("Done.");
         }
     }
 
     public static void delete(String imagePath) {
-        logger.info("Delete file...");
+        logger.info("Delete file");
         File image = new File(imagePath);
 
         if (image.exists()) {
             image.delete();
         }
-
-        logger.info("Done.");
     }
 }
