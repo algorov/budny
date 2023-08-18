@@ -13,15 +13,15 @@ public class Menu extends Thread {
     private final BufferedReader reader;
     private boolean flag;
 
-    public static void getInstance(Budny app) {
-        Menu menu = new Menu(app);
-        menu.start();
-    }
-
     public Menu(Budny app) {
         this.app = app;
         this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.flag = false;
+    }
+
+    public static void getInstance(Budny app) {
+        Menu menu = new Menu(app);
+        menu.start();
     }
 
     @Override
@@ -51,14 +51,6 @@ public class Menu extends Thread {
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
-        } catch (InterruptedException ex) {
-            try {
-                this.reader.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            Thread.currentThread().interrupt();
         }
 
         try {
@@ -106,9 +98,8 @@ public class Menu extends Thread {
         }
     }
 
-    private void quit() throws InterruptedException {
+    private void quit() {
         logger.info("Exit");
         this.app.complete();
-        throw new InterruptedException();
     }
 }

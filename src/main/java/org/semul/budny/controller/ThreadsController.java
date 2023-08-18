@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ThreadsController extends Thread implements Controller<Thread> {
-    public static ThreadsController controller = null;
+    public static Controller controller = null;
     public static List<Thread> pool = new ArrayList<>();
 
     public static Controller getInstance() {
-        controller = new ThreadsController();
-        controller.start();
+        ThreadsController temp = new ThreadsController();
+        temp.start();
+        controller = temp;
 
-        return controller;
+        return temp;
     }
 
     public static void add(Thread thread) {
@@ -44,7 +45,9 @@ public class ThreadsController extends Thread implements Controller<Thread> {
 
     private void quit() {
         for (Thread thread : pool) {
-            thread.interrupt();
+            if (!thread.isInterrupted()) {
+                thread.interrupt();
+            }
         }
     }
 }

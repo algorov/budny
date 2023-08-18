@@ -14,7 +14,7 @@ public abstract class EventAbstract implements Eventable {
         this.password = password;
     }
 
-    // Классы-наследники должны переопределить метод!
+    // Derived classes must override the method!
     @Override
     public void run() throws Exception {
     }

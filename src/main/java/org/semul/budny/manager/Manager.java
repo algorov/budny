@@ -13,16 +13,16 @@ public class Manager extends Thread {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Manager.class);
     private final ArrayList<Account> accounts;
 
+    private Manager() {
+        logger.info("Initialization");
+        this.accounts = new ArrayList<>();
+    }
+
     public static Manager getInstance() {
         Manager manager = new Manager();
         manager.start();
 
         return manager;
-    }
-
-    private Manager() {
-        logger.info("Initialization");
-        this.accounts = new ArrayList<>();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Manager extends Thread {
             }
 
             try {
-                Thread.sleep(15000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

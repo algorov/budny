@@ -7,31 +7,34 @@ import org.semul.budny.exception.ExeptionCount;
 import org.semul.budny.manager.Manager;
 import org.semul.budny.menu.Menu;
 
+import static org.semul.budny.controller.ThreadsController.controller;
+
 public class Budny {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Budny.class);
     private final Manager manager;
-    private final Controller<Thread> threadsController;
     private volatile boolean isAlive;
 
 
-    public Budny() {
-        this.isAlive = true;
-        this.threadsController = ThreadsController.getInstance();
+    public Budny(Controller controller) {
         TasksController.startThread();
         Menu.getInstance(this);
         this.manager = Manager.getInstance();
+        this.isAlive = true;
     }
 
     public static void main(String[] args) {
         logger.info("Initialization");
-        Budny app = new Budny();
+        Budny app = new Budny(ThreadsController.getInstance());
 
-        while (app.isAlive && ExeptionCount.count < 5 && app.threadsController.isLive()) {
+        while (app.isAlive && ExeptionCount.count <= 5 && controller.isLive()) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        if (app.threadsController.isLive()) {
-            app.threadsController.close();
-        }
+        controller.close();
     }
 
     public void signIn(String username, String password) {

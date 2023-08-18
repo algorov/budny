@@ -44,7 +44,7 @@ public class EventDriver {
             driver = new ChromeDriver(option);
         } catch (Exception e) {
             logger.error(e);
-            controller.interrupt();
+            controller.close();
             throw new RuntimeException(e);
         }
 
