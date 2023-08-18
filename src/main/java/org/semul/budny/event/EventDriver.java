@@ -1,11 +1,14 @@
 package org.semul.budny.event;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.semul.budny.exception.FailAuthorizationException;
 import org.semul.budny.exception.FailEmployException;
 
 import java.time.Duration;
+
+import static org.semul.budny.controller.ThreadsController.controller;
 
 public class EventDriver {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(EventDriver.class);
@@ -25,23 +28,29 @@ public class EventDriver {
     }
 
     public static ChromeDriver getDriver() {
-        logger.info("Init driver...");
+        logger.info("Init driver");
 
-        String path = System.getProperty("user.dir") + "/driver/chromedriver";
-        System.setProperty("webdriver.chrome.driver", path);
+        WebDriverManager.chromedriver().setup();
 
         ChromeOptions option = new ChromeOptions();
         String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
         option.addArguments("user-agent=" + userAgent);
         option.addArguments("--disable-blink-features=AutomationControlled");
         option.addArguments("--remote-allow-origins=*");
+        option.addArguments("headless");
 
-        ChromeDriver driver = new ChromeDriver(option);
+        ChromeDriver driver = null;
+        try {
+            driver = new ChromeDriver(option);
+        } catch (Exception e) {
+            logger.error(e);
+            controller.interrupt();
+            throw new RuntimeException(e);
+        }
+
         driver.manage().timeouts().pageLoadTimeout(Duration.ofMillis(60000));
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
         driver.manage().timeouts().scriptTimeout(Duration.ofMillis(5000));
-
-        logger.info("Successfully.");
 
         return driver;
     }

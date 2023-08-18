@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ThreadsController extends Thread implements Controller<Thread> {
+    public static ThreadsController controller = null;
     public static List<Thread> pool = new ArrayList<>();
 
     public static Controller getInstance() {
-        ThreadsController controller = new ThreadsController();
+        controller = new ThreadsController();
         controller.start();
 
         return controller;
@@ -29,6 +30,11 @@ public class ThreadsController extends Thread implements Controller<Thread> {
         }
 
         quit();
+    }
+
+    @Override
+    public boolean isLive() {
+        return !this.isInterrupted();
     }
 
     @Override

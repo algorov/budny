@@ -37,6 +37,11 @@ public class TasksController extends Thread implements Controller<Task> {
     }
 
     @Override
+    public boolean isLive() {
+        return !this.isInterrupted();
+    }
+
+    @Override
     public void close() {
         this.interrupt();
     }

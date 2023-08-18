@@ -1,17 +1,17 @@
 package org.semul.budny;
 
-import org.semul.budny.exception.ExeptionCount;
 import org.semul.budny.controller.Controller;
 import org.semul.budny.controller.TasksController;
 import org.semul.budny.controller.ThreadsController;
+import org.semul.budny.exception.ExeptionCount;
 import org.semul.budny.manager.Manager;
 import org.semul.budny.menu.Menu;
 
 public class Budny {
     public static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Budny.class);
-    private volatile boolean isAlive;
     private final Manager manager;
     private final Controller<Thread> threadsController;
+    private volatile boolean isAlive;
 
 
     public Budny() {
@@ -26,10 +26,12 @@ public class Budny {
         logger.info("Initialization");
         Budny app = new Budny();
 
-        while (app.isAlive && ExeptionCount.count < 5) {
+        while (app.isAlive && ExeptionCount.count < 5 && app.threadsController.isLive()) {
         }
 
-        app.threadsController.close();
+        if (app.threadsController.isLive()) {
+            app.threadsController.close();
+        }
     }
 
     public void signIn(String username, String password) {
