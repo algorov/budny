@@ -32,7 +32,7 @@ public class Account extends Thread {
     public static synchronized Account getInstance(String username, String password) {
         Account account = new Account(username, password);
         account.start();
-        ThreadsController.pool.add(account);
+
         return account;
     }
 
@@ -49,6 +49,8 @@ public class Account extends Thread {
 
     @Override
     public void run() {
+        ThreadsController.add(this);
+
         try {
             launch();
 

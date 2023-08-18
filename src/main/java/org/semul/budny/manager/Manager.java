@@ -27,7 +27,7 @@ public class Manager extends Thread {
 
     @Override
     public void run() {
-        ThreadsController.pool.add(this);
+        ThreadsController.add(this);
 
         while (!Thread.currentThread().isInterrupted()) {
             if (TasksController.size() == 0) {

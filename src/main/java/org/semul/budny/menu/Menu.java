@@ -16,7 +16,6 @@ public class Menu extends Thread {
     public static void getInstance(Budny app) {
         Menu menu = new Menu(app);
         menu.start();
-        ThreadsController.pool.add(menu);
     }
 
     public Menu(Budny app) {
@@ -27,6 +26,8 @@ public class Menu extends Thread {
 
     @Override
     public void run() {
+        ThreadsController.pool.add(this);
+
         greetings();
 
         try {

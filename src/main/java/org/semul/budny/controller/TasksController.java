@@ -11,7 +11,6 @@ public class TasksController extends Thread implements Controller<Task> {
     public static void startThread() {
         TasksController controller = new TasksController();
         controller.start();
-        ThreadsController.pool.add(controller);
     }
 
     public static void add(Task task) {
@@ -24,6 +23,8 @@ public class TasksController extends Thread implements Controller<Task> {
 
     @Override
     public void run() {
+        ThreadsController.add(this);
+
         while (!Thread.currentThread().isInterrupted()) {
             tasks.removeIf(task -> task.getState() == State.TERMINATED);
             try {
