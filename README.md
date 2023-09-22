@@ -46,7 +46,7 @@ mvn compile && mvn exec:java -Dexec.mainClass="org.semul.budny.Budny"
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/algorov"><img src="https://avatars.githubusercontent.com/u/90800616?v=4?s=100" width="100px;" alt="SEMUL"/><br /><sub><b>SEMUL</b></sub></a><br /><a href="https://github.com/algorov/emb/commits?author=algorov" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/algorov"><img src="https://avatars.githubusercontent.com/u/90800616?v=4?s=100" width="100px;" alt="SEMUL"/><br /><sub><b>SEMUL</b></sub></a><br /><a href="https://github.com/algorov/budny/commits?author=algorov" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
